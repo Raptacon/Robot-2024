@@ -3,12 +3,12 @@ name: Raptacon (Team 3200) CI Pipeline
 on:
   push:
   pull_request:
-  env:
-    - PYTHON_VERSION: 3.12.1
 
   schedule:
     - cron: '0 2 * * *'
 
+env:
+  PYTHON_VERSION: 3.12.1
 
 jobs:
   RobotUnitTestWindows:
