@@ -170,7 +170,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+        self.driveEncoder = self.driveMotor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -246,6 +246,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
         return math.radians(self.encoder.getAbsolutePosition())
+    def getDrivePosition(self):
+        return self.driveEncoder.getPosition()
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
 
@@ -319,7 +321,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         vel = self.getDriveVelocity()
 
         # calculate total distance traveled
-        self.distTraveled += vel * .02
+        self.distTraveled += self.getDrivePosition()
+        print(self.distTraveled)
         ang = self.getSteerAngle()
         if self.table:
             self.table.putNumber("curr steer deg", math.degrees(ang))
