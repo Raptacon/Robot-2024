@@ -140,13 +140,12 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.encoder = hardware.CANcoder(self.cancoderId)
         encoderConfig = configs.CANcoderConfiguration()
         self.encoderConfigurator = self.encoder.configurator
-        self.encoderConfigurator.refresh(encoderConfig)
-        self.encoderVoltageSignal = self.encoder.get_supply_voltage()
-        status = self.encoderVoltageSignal.status
+        status = self.encoderConfigurator.refresh(encoderConfig)
         if status != StatusCode.OK:
             raise RuntimeError(f"Failed to configure CAN encoder on id {self.cancoderId}. Error {status}")
         encoderPositionSignal = self.encoder.get_position()
         encoderVelocitySignal = self.encoder.get_velocity()
+        self.encoderVoltageSignal = self.encoder.get_supply_voltage()
         self.encoderVoltageSignal.set_update_frequency(0)
         status = BaseStatusSignal.set_update_frequency_for_all(250, [encoderPositionSignal, encoderVelocitySignal])
         if status != StatusCode.OK:
