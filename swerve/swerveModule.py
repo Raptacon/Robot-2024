@@ -222,14 +222,17 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.steerController = SteerController(self)
 
     def getAbsoluteAngle(self) -> float:
-        """gets the last abs angle encoder value radians"""
-        angle_deg = self.encoder.get_absolute_position().value *  360
-        angle = math.radians(angle_deg)
-        angle %= 2.0 * math.pi
-        if angle < 0.0:
-            angle += 2.0 * math.pi
+        """gets the last abs angle encoder value degrees -180 - +180"""
+        angle_deg = self.encoder.get_absolute_position().value * 180.0
+        angle_deg = ((angle_deg + 180) % 360) - 180
+        if angle_deg < -180.0:
+            angle_deg += 360.0
         print(f"{self.cancoderId}: {angle_deg} - {angle}")
-        return angle
+        return angle_deg
+
+    def getAbsoluteRadians(self) -> float:
+        """gets the last abs angle encoder value radians -pi - +pi"""
+        return self.getAbsoluteAngle() / 180.0 * math.pi
 
     def setDriveVoltage(self, voltage : float):
         '''sets module drive voltage (speed)'''
@@ -266,40 +269,32 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         Sets the modules drive voltage and steer angle.
         Trys to prevent 180 degree turns on module if can rotate closer one direction
         '''
-        #convert to radians
-        steerAngle = math.radians(steerAngleDeg)
-        #if steerAngle < 0.0:
-        #    steerAngle += 2.0 * math.pi
+        assert(steerAngleDeg >-180 and steerAngleDeg <180.0)
 
-        # currVel, currAngle = self.getPosition()
-
-        steerDiff = steerAngle - self.getSteerAngle()
+        steerDiff = steerAngleDeg - self.getSteerAngle()
         #print(f"steer deg {steerAngleDeg}, steerAngle {steerAngle} diff {steerDiff}")
         # Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
-        if steerDiff >= math.pi:
-            steerAngle -= 2.0 * math.pi
-        elif steerDiff < -math.pi:
-            steerAngle += 2.0 * math.pi
-        steerDiff1 = steerDiff - self.getSteerAngle()
-
-        #print(f"steer deg {steerAngleDeg}, steerAngle {steerAngle} diff {steerDiff}, {steerDiff1}")
-        steerDiff = steerDiff1
+        if steerDiff >= 180.0:
+            steerAngle -= 360.0
+        elif steerDiff < -180.0:
+            steerAngle += 360
+        
         #If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
         #movement of the module is less than 90 deg
-        if (steerDiff < math.pi / 2.0) or (steerDiff < (-math.pi / 2.0)):
-            steerAngle += math.pi
+        if (steerDiff < 180) or (steerDiff < (-180.0)):
+            steerAngleDeg += 180
             driveVoltage *= -1.0
 
-        # put steer angle in range of [0, 2pi)
-        steerAngle %= 2.0 * math.pi
-        if steerAngle < 0.0:
-            steerAngle += 2.0 * math.pi
+        # put steer angle in range of [-180, 180)
+        steerAngleDeg = ((steerAngleDeg + 180) % 360) - 180
+        
+        assert(steerAngleDeg >= -90 and steerAngleDeg <= 90.0)
 
         self.setDriveVoltage(driveVoltage)
-        self.steerController.setReferenceAngle(math.radians(steerAngleDeg))
+        self.steerController.setReferenceAngle(steerAngleDeg)
 
         if self.table:
-            self.table.putNumber("set steer deg", math.degrees(steerAngle))
+            self.table.putNumber("set steer deg", steerAngleDeg)
             self.table.putNumber("drive %", driveVoltage / self.kNominalVoltage)
 
 
@@ -334,16 +329,3 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
             self.driveMotor.disable()
         if steer:
             self.steerMotor.disable()
-
-    def setCal(self, enable):
-        if enable:
-            # self.driveMotor.setNeutralMode(ctre.NeutralMode.Coast)
-            encoderConfig = configs.CANcoderConfiguration()
-            self.encoderConfigurator.refresh(encoderConfig)
-            status = self.encoder.get_supply_voltage().status
-            if status != 0:
-                log.error(f"{self.name} failed to set val {status}")
-                
-        else:
-            # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
-            pass

@@ -184,7 +184,3 @@ class Drivetrain(commands2.SubsystemBase):
 
     def getFieldDriveRelative(self) -> bool:
         return self.fieldRelative
-
-    def calWheels(self, enable):
-        for m in self.swerveModules:
-            m.setCal(enable)
