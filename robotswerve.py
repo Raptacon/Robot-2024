@@ -80,7 +80,7 @@ class RobotSwerve:
         pass
 
 
-    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal"]
+    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", 'Wheels Dir']
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
@@ -111,7 +111,6 @@ class RobotSwerve:
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)
         match self.testChooser.getSelected():
             case "Drive Disable":
-                print("Drive Disable")
                 self.calEn = False
                 self.calDis = False
                 self.driveTrain.disable()
@@ -119,8 +118,6 @@ class RobotSwerve:
                 #self.driveTrain.setSteer(wheelAngle)
                 ang = (math.degrees(math.atan2(LeftY, LeftX)) +90.0) %360.0
                 if(abs(LeftX) < 0.8 and abs(LeftY) < 0.8):
-                    pass
-                    print("pass")
                     self.driveTrain.setSteer(ang)
                     self.driveTrain.setDrive(RightY)
                 else:
@@ -130,6 +127,8 @@ class RobotSwerve:
                     self.driveTrain.setDrive(RightY)
             case "Wheels Drive":
                 self.driveTrain.setDrive(RightY)
+            case "Wheels Dir":
+                self.driveTrain.setSteer(ang)
             case "Enable Cal":
                 if not self.calEn:
                     self.driveTrain.calWheels(True)

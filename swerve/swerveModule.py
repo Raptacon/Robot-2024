@@ -140,10 +140,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.encoder = hardware.CANcoder(self.cancoderId)
         encoderConfig = configs.CANcoderConfiguration()
         self.encoderConfigurator = self.encoder.configurator
-        encoderConfig.magnet_sensor.absolute_sensor_range = signals.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
-        encoderConfig.magnet_sensor.magnet_offset = encoderCal
-        encoderConfig.magnet_sensor.sensor_direction = signals.SensorDirectionValue.CLOCKWISE_POSITIVE
-        self.encoderConfigurator.apply(encoderConfig)
+        self.encoderConfigurator.refresh(encoderConfig)
         self.encoderVoltageSignal = self.encoder.get_supply_voltage()
         status = self.encoderVoltageSignal.status
         if status != StatusCode.OK:
@@ -249,9 +246,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         return self.driveEncoder.getVelocity() * self.driveSensorVelocityCoefficient
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
-        return math.radians(self.getSteerDegree())
-    def getSteerDegree(self):
-        return self.encoder.get_absolute_position().value * 360
+        return self.encoder.get_absolute_position().value * (2 * math.pi)
     def getDrivePosition(self):
         return self.driveEncoder.getPosition()
     def getCurrentAngle(self):
@@ -344,10 +339,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         if enable:
             # self.driveMotor.setNeutralMode(ctre.NeutralMode.Coast)
             encoderConfig = configs.CANcoderConfiguration()
-            encoderConfig.magnet_sensor.absolute_sensor_range = signals.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
-            encoderConfig.magnet_sensor.magnet_offset = 0
-            encoderConfig.magnet_sensor.sensor_direction = signals.SensorDirectionValue.CLOCKWISE_POSITIVE
-            self.encoderConfigurator.apply(encoderConfig)
+            self.encoderConfigurator.refresh(encoderConfig)
             status = self.encoder.get_supply_voltage().status
             if status != 0:
                 log.error(f"{self.name} failed to set val {status}")

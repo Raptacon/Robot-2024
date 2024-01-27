@@ -49,7 +49,7 @@ class Drivetrain(commands2.SubsystemBase):
         self.table = self.datatable.getTable("Drivetrain")
         self.posTable = self.datatable.getTable("Robot position")
         assert(self.table)
-        for module in Drivetrain.kModuleProps:
+        for module in Drivetrain.kModulePropsNoCal:
             name = module["name"]
             subTable = self.table.getSubTable(name)
             assert(subTable)
