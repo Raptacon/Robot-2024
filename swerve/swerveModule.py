@@ -248,8 +248,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         '''gets module drive voltage (speed)'''
         return self.driveEncoder.getVelocity() * self.driveSensorVelocityCoefficient
     def getSteerAngle(self):
-        '''gets current angle in radians of module setpoint'''
-        return self.encoder.get_absolute_position().value * (2 * math.pi)
+        '''gets current angle in degrees [-180, 180] of module setpoint'''
+        return self.encoder.get_absolute_position().value * (180.0)
     def getDrivePosition(self):
         return self.driveEncoder.getPosition()
     def getCurrentAngle(self):
@@ -281,13 +281,12 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         
         #If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
         #movement of the module is less than 90 deg
-        if (steerDiff < 180) or (steerDiff < (-180.0)):
+        if (steerDiff >= 180) or (steerDiff <= (-180.0)):
             steerAngleDeg += 180
             driveVoltage *= -1.0
 
         # put steer angle in range of [-180, 180)
         steerAngleDeg = ((steerAngleDeg + 180) % 360) - 180
-        
         assert(steerAngleDeg >= -90 and steerAngleDeg <= 90.0)
 
         self.setDriveVoltage(driveVoltage)
