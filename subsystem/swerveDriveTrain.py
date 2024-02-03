@@ -143,8 +143,9 @@ class Drivetrain(commands2.SubsystemBase):
                              self.swerveModules[0].getPosition(),
                              self.swerveModules[2].getPosition()))
          if self.posTable:
-            self.posTable.putNumber("Robot_PosX", self.pos.X())
-            self.posTable.putNumber("Robot_PosY", self.pos.Y())
+            self.posTable.putNumber("Robot_PosX", self.pos.translation().x_feet)
+            self.posTable.putNumber("Robot_PosY", self.pos.translation().y_feet)
+            self.posTable.putNumber("Robot_Angle", self.pos.translation().angle().degrees())
          else:
             self.posTable = self.datatable.getTable("Robot position")
 
