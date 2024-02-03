@@ -8,7 +8,6 @@ import wpimath.controller
 import rev
 import logging as log
 
-
 from .steerController import SteerController
 import ntcore
 
@@ -170,7 +169,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getAbsoluteEncoder(rev.SparkAbsoluteEncoder.Type.kDutyCycle)
+        self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor) 
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -319,9 +318,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
 
     def getPosition(self):
         vel = self.getDriveVelocity()
-
-        # calculate total distance traveled
-        self.distTraveled += self.getDrivePosition()
+        self.distTraveled = self.getDrivePosition()
         print(self.distTraveled)
         ang = self.getSteerAngle()
         if self.table:
