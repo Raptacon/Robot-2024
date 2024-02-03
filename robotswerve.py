@@ -43,7 +43,8 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
 
-        self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain.odometry)
+        if True:
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain.odometry)
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
@@ -55,9 +56,9 @@ class RobotSwerve:
         ))'''
 
     def robotPeriodic(self) -> None:
-        self.telemetry.runDataCollections()
+        if self.telemetry:
+            self.telemetry.runDataCollections()
         
-
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
         pass
