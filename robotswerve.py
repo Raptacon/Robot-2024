@@ -10,10 +10,11 @@ from subsystem.swerveDriveTrain import Drivetrain
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
-from utils.telemetry import Telemetry
+from telemetry import Telemetry
 
 import math
 kDriveControllerIdx = 0
+kMechControllerIdx = 1
 lastDeg =0
 
 class RobotSwerve:
@@ -23,6 +24,7 @@ class RobotSwerve:
 
     def __init__(self) -> None:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
+        self.mechController = wpilib.XboxController(kMechControllerIdx)
         self.driveTrain = Drivetrain()
 
         #self.driveController = wpilib.XboxController(0)
@@ -41,7 +43,7 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
 
-        self.telemetry = Telemetry(self.driveController)
+        self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain.odometry)
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(

@@ -1,10 +1,11 @@
 import wpilib
+import wpimath
 
 from wpiutil.log import (
     DataLog, BooleanLogEntry, StringLogEntry, FloatLogEntry, IntegerLogEntry, 
 )
 
-telemetryEntries = [
+telemetryButtonEntries = [
     ["AButton", BooleanLogEntry, "/button/letter/a"],
     ["BButton", BooleanLogEntry, "/button/letter/b"],
     ["XButton", BooleanLogEntry, "/button/letter/x"],
@@ -24,19 +25,29 @@ telemetryEntries = [
     ["DPad", IntegerLogEntry, "button/dpad"]
 ]
 
+telemetryOdometryEntries = [
+    ["xPositions", FloatLogEntry, "xpos"],
+    ["yPositions", FloatLogEntry, "ypos"],
+    ["angles", FloatLogEntry, "angle"]
+]
+
 class Telemetry():    
     def __init__(self, 
-                 driverController: wpilib.XboxController, 
-                 mechController: wpilib.XboxController
-                 
+                 driverController: wpilib.XboxController = None, 
+                 mechController: wpilib.XboxController = None,
+                 odometry: wpimath.kinematics.SwerveDrive4Odometry = None
                  
                  ):
         self.driverController = driverController
         self.mechController = mechController
+        self.odometryPosition = odometry
         self.datalog = DataLog("log")
-        for entryname, entrytype, logname in telemetryEntries:
+        for entryname, entrytype, logname in telemetryButtonEntries:
             setattr(self, "driver" + entryname, entrytype(self.datalog, "driver/" + logname))
             setattr(self, "mech" + entryname, entrytype(self.datalog, "mech/" + logname))
+        for entryname, entrytype, logname in telemetryOdometryEntries:
+            setattr(self, entryname, entrytype(self.datalog, "odometry/" + logname))
+
 
     def getDriverControllerInputs(self):
         self.driverAButton.append(self.driverController.getAButton()) #bool
@@ -51,10 +62,10 @@ class Telemetry():
         self.driverRightStickButton.append(self.driverController.getRightStickButton()) #bool
         self.driverLeftTrigger.append(self.driverController.getLeftTriggerAxis()) #float 0-1
         self.driverRightTrigger.append(self.driverController.getRightTriggerAxis()) #float 0-1
-        self.driverLeftY.append(self.driverController.getLeftY()) #float -1-1
-        self.driverLeftX.append(self.driverController.getLeftX()) #float -1-1
-        self.driverRightY.append(self.driverController.getRightY()) #float -1-1
-        self.driverRightX.append(self.driverController.getRightX()) #float -1-1
+        self.driverJoystickLeftY.append(self.driverController.getLeftY()) #float -1-1
+        self.driverJoystickLeftX.append(self.driverController.getLeftX()) #float -1-1
+        self.driverJoystickRightY.append(self.driverController.getRightY()) #float -1-1
+        self.driverJoystickRightX.append(self.driverController.getRightX()) #float -1-1
         self.driverDPad.append(self.driverController.getPOV()) #ints
 
     def getMechControllerInputs(self):
@@ -70,13 +81,22 @@ class Telemetry():
         self.mechRightStickButton.append(self.mechController.getRightStickButton()) #bool
         self.mechLeftTrigger.append(self.mechController.getLeftTriggerAxis()) #float 0-1
         self.mechRightTrigger.append(self.mechController.getRightTriggerAxis()) #float 0-1
-        self.mechLeftY.append(self.mechController.getLeftY()) #float -1-1
-        self.mechLeftX.append(self.mechController.getLeftX()) #float -1-1
-        self.mechRightY.append(self.mechController.getRightY()) #float -1-1
-        self.mechRightX.append(self.mechController.getRightX()) #float -1-1
+        self.mechJoystickLeftY.append(self.mechController.getLeftY()) #float -1-1
+        self.mechJoystickLeftX.append(self.mechController.getLeftX()) #float -1-1
+        self.mechJoystickRightY.append(self.mechController.getRightY()) #float -1-1
+        self.mechJoystickRightX.append(self.mechController.getRightX()) #float -1-1
         self.mechDPad.append(self.mechController.getPOV()) #ints
+
+    def getOdometryInputs(self):
+        pose = self.odometryPosition.getPose()
+        self.xPositions.append(pose.X())
+        self.yPositions.append(pose.Y())
+        self.angles.append(pose.rotation().degrees())
     
     def runDataCollections(self):
-        self.getDriverControllerInputs()
-        self.getMechControllerInputs()
-        
+        if self.driverController is not None:
+            self.getDriverControllerInputs()
+        if self.mechController is not None:
+            self.getMechControllerInputs()
+        if self.odometryPosition is not None:
+            self.getOdometryInputs()
