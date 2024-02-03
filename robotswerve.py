@@ -10,6 +10,7 @@ from subsystem.swerveDriveTrain import Drivetrain
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
+from utils.telemetry import Telemetry
 
 import math
 kDriveControllerIdx = 0
@@ -40,6 +41,8 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
 
+        self.telemetry = Telemetry(self.driveController)
+
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
             self.driveTrain,
@@ -49,6 +52,9 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))'''
 
+    def robotPeriodic(self) -> None:
+        self.telemetry.runDataCollections()
+        
 
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
