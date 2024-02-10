@@ -11,6 +11,8 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
+from subsystems.intake.intake import *
+
 import math
 kDriveControllerIdx = 0
 lastDeg =0
@@ -23,6 +25,9 @@ class RobotSwerve:
     def __init__(self) -> None:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.driveTrain = Drivetrain()
+
+        self.machine = IntakeStateMachine()
+        self.machine.disable()
 
         #self.driveController = wpilib.XboxController(0)
 
@@ -77,13 +82,15 @@ class RobotSwerve:
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
-        pass
-
-
     testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal"]
+    
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
+        self.timer = wpilib.Timer()
+        self.timer.reset()
+        self.timer.start()
+
         self.calEn = False
         self.calDis = False
         self.testChooser = wpilib.SendableChooser()
@@ -106,7 +113,19 @@ class RobotSwerve:
         RightY = wpimath.applyDeadband(self.driveController.getRightY(), 0.1)
         global lastDeg
 
+        if self.driveController.getYButton():
+            self.machine.enable()
+        elif self.driveController.getBButton():
+            self.machine.disable()
+        elif self.driveController.getAButton():
+            self.machine.reset()
+            self.machine.disable()
+        
+        if self.timer.advanceIfElapsed(1):
+            self.machine.run()
 
+        #DELETE THIS
+        return
 
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)
         match self.testChooser.getSelected():

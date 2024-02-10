@@ -1,15 +1,18 @@
-from stateMachine import *
+from stateMachines.stateMachine import *
 import random
 import time
+import wpilib
 
-CHANCE_TO_SIGHT = 1
-CHANCE_TO_STAY = 1
+CHANCE_TO_SIGHT = 0.25
+CHANCE_TO_STAY = 0.5
 CHANCE_FOR_HORRIBLE_ERROR = 0
 
 class IntakeStateMachine(StateMachine):
     def __init__(self, states=[], initialState=None):
         self.noteSighted = False
         self.atDest = False
+
+        self.testTimer = wpilib.Timer()
 
         states=[]
 
@@ -24,16 +27,14 @@ class IntakeStateMachine(StateMachine):
         #move to note (macro)
         move = State(
             name="MoveToNote",
-            run=lambda: self.moveFunc(input("Did we move there? (Y for yes, N for no, M for assume manual control, anything else for moving): ")),
-            transition=lambda: self.evalMove()
+            transition=lambda: "Lineup"
         )
         states.append(move)
 
         #lineup with note (micro)
         lineup = State(
             name="Lineup",
-            run=lambda: self.moveFunc(input("Did we lineup right? (Y for yes, N for no, M for manual control, anything else for moving): ")),
-            transition=lambda: self.evalLineup() 
+            transition=lambda: "SpinMotors"
         )
         states.append(lineup)
 
@@ -47,7 +48,6 @@ class IntakeStateMachine(StateMachine):
         #reset the bot
         reset = State(
             name="Reset",
-            enter=lambda: time.sleep(2),
             transition=lambda: "ROOT_STATE"
         )
         states.append(reset)
@@ -63,7 +63,7 @@ class IntakeStateMachine(StateMachine):
         #clamp the disc in the motors!
         clamp = State(
             name="Clamp",
-            transition=lambda: "Gloop" if not input("Note lost? Enter Y for yes, anything else for no.: ") == "Y" else "ReverseClamp"
+            transition=lambda: "Gloop"
         )
         states.append(clamp)
 
@@ -84,7 +84,6 @@ class IntakeStateMachine(StateMachine):
         #prep fire
         prepFire = State(
             name="PrepFire",
-            enter=lambda: time.sleep(3),
             transition=lambda: "Fire"
         )
         states.append(prepFire)
@@ -144,7 +143,6 @@ class IntakeStateMachine(StateMachine):
     #spinning motors
     def spinThosePuppies(self):
         print("Those puppers are revving!")
-        time.sleep(1)
         print("Those puppers are spinning!")
     
     def checkForDisc(self):
@@ -160,10 +158,10 @@ class IntakeStateMachine(StateMachine):
 
 refTime = time.time()
 
-if __name__ == "__main__":
-    machine = IntakeStateMachine()
-    while True:
-        dt = time.time() - refTime
-        if dt > 0.1:
-            machine.run()
-            refTime = time.time()
+# if __name__ == "__main__":
+#     machine = IntakeStateMachine()
+#     while True:
+#         dt = time.time() - refTime
+#         if dt > 0.1:
+#             machine.run()
+#             refTime = time.time()

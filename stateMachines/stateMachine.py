@@ -1,4 +1,4 @@
-from state import State
+from stateMachines.state import State
 import random
 
 class StateMachine():
@@ -6,6 +6,7 @@ class StateMachine():
         self.states = states
         self.isActive = True
         self.priorityState = None
+        self.lastState = None
         
         #default to some root state, could be an error handler
         self.rootState = State("ROOT_STATE", transition=lambda: str(initialState if initialState != None else states[0]))
@@ -27,14 +28,12 @@ class StateMachine():
             self.setState(self.priorityState)
             self.priorityState = None
 
-        self.currentState.run()
-
-        # try:
-        #     self.currentState.run()
-        # except Exception:
-        #     print("ERROR! Encountered error while running.")
-        #     self.reset()
-        #     return
+        try:
+            self.currentState.run()
+        except Exception:
+            print("ERROR! Encountered error while running.")
+            self.reset()
+            return
         
         #check if a priority state was set during run
         if self.priorityState: return
@@ -45,7 +44,7 @@ class StateMachine():
                 print(f"ERROR! Transition from {self.currentState} to {newState} cannot be found. Check that the state is correctly added or named!")
                 self.reset()
         
-    def setState(self, state):
+    def setState(self, state:str):
         """
         Set the current state in the machine.
         """
@@ -86,13 +85,23 @@ class StateMachine():
         """
         Enable the machine
         """
-        self.isActive = True
+        if self.isActive == False:
+            self.isActive = True
+
+            #i hate this
+            self.setState(str(self.lastState))
+            print(f"Restoring state {self.lastState}\n")
+            self.lastState = None
     
     def disable(self):
         """
         Disable the machine
         """
-        self.isActive = False
+        if self.isActive == True:
+            self.isActive = False
+            self.lastState = self.currentState
+            print(f"Caching state {self.lastState}\n")
+            self.reset()
         
     def addState(self, state):
         """
