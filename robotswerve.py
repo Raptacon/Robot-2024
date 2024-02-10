@@ -6,7 +6,10 @@ import wpimath
 import commands2.button
 
 from subsystem.swerveDriveTrain import Drivetrain
+from subsystem.swerveIntake import SwerveIntake
+from subsystem.swerveIntakePivot import SwerveIntakePivot
 
+from commands.intake import Intake
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
@@ -25,8 +28,11 @@ class RobotSwerve:
     def __init__(self) -> None:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.mechController = wpilib.XboxController(kMechControllerIdx)
+
         self.driveTrain = Drivetrain()
 
+        self.intake = SwerveIntake()
+        self.pivot = SwerveIntakePivot()
         #self.driveController = wpilib.XboxController(0)
 
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -46,6 +52,13 @@ class RobotSwerve:
         if True:
             self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain)
 
+        self.intake.setDefaultCommand(Intake(
+            self.intake,
+            self.pivot,
+            lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
+            lambda: self.mechController.getLeftBumper(),
+            lambda: wpimath.applyDeadband(self.mechController.getLeftY(), 0.06),
+        ))
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
             self.driveTrain,
@@ -88,8 +101,7 @@ class RobotSwerve:
         """This function is called periodically during operator control"""
         pass
 
-
-    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal"]
+    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", "Wheel Pos"]
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
@@ -145,6 +157,8 @@ class RobotSwerve:
                     self.calEn = False
             case "Disable Cal":
                 self.driveTrain.calWheels(False)
+            case "Wheel Pos":
+                self.driveTrain.setSteer(wheelAngle)
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
