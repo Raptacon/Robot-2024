@@ -63,7 +63,7 @@ class IntakeStateMachine(StateMachine):
         #clamp the disc in the motors!
         clamp = State(
             name="Clamp",
-            transition=lambda: "Gloop" if random.random()  > CHANCE_FOR_HORRIBLE_ERROR else "ReverseClamp"
+            transition=lambda: "Gloop" if not input("Note lost? Enter Y for yes, anything else for no.: ") == "Y" else "ReverseClamp"
         )
         states.append(clamp)
 
