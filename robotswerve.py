@@ -8,7 +8,6 @@ import commands2.button
 from subsystem.swerveDriveTrain import Drivetrain
 from subsystem.swerveIntake import SwerveIntake
 from subsystem.swerveIntakePivot import SwerveIntakePivot
-from subsystem.swerveIntakePivotController import pivotController
 
 from commands.intake import Intake
 from commands.defaultdrive import DefaultDrive
@@ -33,8 +32,6 @@ class RobotSwerve:
 
         self.intake = SwerveIntake()
         self.pivot = SwerveIntakePivot()
-        self.intakePivotController = pivotController()
-        self.intakePivotController.setIntakeRotationSubsystem(self.pivot)
         #self.driveController = wpilib.XboxController(0)
 
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -52,11 +49,10 @@ class RobotSwerve:
         ))
         self.intake.setDefaultCommand(Intake(
             self.intake,
-            self.intakePivotController,
+            self.pivot,
             lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
             lambda: self.mechController.getLeftBumper(),
-            lambda: self.mechController.getAButton(),
-            lambda: self.mechController.getBButton()
+            lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
         ))
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
