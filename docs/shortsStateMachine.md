@@ -1,4 +1,4 @@
-```Mermaid
+```mermaid
 
 flowchart TB
     Machine{STATE MACHINE}-->Root
