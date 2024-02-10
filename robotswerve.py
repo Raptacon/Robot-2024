@@ -44,7 +44,7 @@ class RobotSwerve:
         ))
 
         if True:
-            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain.odometry)
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain)
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(

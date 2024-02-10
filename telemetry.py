@@ -1,8 +1,9 @@
 import wpilib
 import wpimath
+from subsystem.swerveDriveTrain import Drivetrain
 
 from wpiutil.log import (
-    DataLog, BooleanLogEntry, StringLogEntry, FloatLogEntry, IntegerLogEntry, 
+    DataLog, BooleanLogEntry, StringLogEntry, FloatLogEntry, IntegerLogEntry
 )
 
 telemetryButtonEntries = [
@@ -31,22 +32,34 @@ telemetryOdometryEntries = [
     ["angles", FloatLogEntry, "angle"]
 ]
 
+telemetrySwerveDriveTrainEntries = []
+for i in range(len(Drivetrain.kModuleProps)):
+    telemetrySwerveDriveTrainEntries.extend([
+        [f"steerDegree{i + 1}", FloatLogEntry, f"module{i + 1}/steerdegree"],
+        [f"drivePercent{i + 1}", FloatLogEntry, f"module{i + 1}/drivepercent"],
+        [f"moduleVelocity{i + 1}", FloatLogEntry, f"module{i + 1}/velocity"]
+    ])
+
 class Telemetry():    
     def __init__(self, 
                  driverController: wpilib.XboxController = None, 
                  mechController: wpilib.XboxController = None,
-                 odometry: wpimath.kinematics.SwerveDrive4Odometry = None
-                 
+                 driveTrain: Drivetrain = None
+
                  ):
         self.driverController = driverController
         self.mechController = mechController
-        self.odometryPosition = odometry
+        self.odometryPosition = driveTrain.odometry
+        self.swerveModules = driveTrain.swerveModules
+
         self.datalog = DataLog("log")
         for entryname, entrytype, logname in telemetryButtonEntries:
             setattr(self, "driver" + entryname, entrytype(self.datalog, "driver/" + logname))
             setattr(self, "mech" + entryname, entrytype(self.datalog, "mech/" + logname))
         for entryname, entrytype, logname in telemetryOdometryEntries:
             setattr(self, entryname, entrytype(self.datalog, "odometry/" + logname))
+        for entryname, entrytype, logname in telemetrySwerveDriveTrainEntries:
+            setattr(self, entryname, entrytype(self.datalog, "swervedrivetrain/" + logname))
 
 
     def getDriverControllerInputs(self):
@@ -92,6 +105,12 @@ class Telemetry():
         self.xPositions.append(pose.X())
         self.yPositions.append(pose.Y())
         self.angles.append(pose.rotation().degrees())
+
+    def getSwerveInputs(self):
+        for i, swerveModule in enumerate(self.swerveModules):
+            getattr(self, f"steerDegree{i + 1}").append(swerveModule.steerAngle)
+            getattr(self, f"drivePercent{i + 1}").append(swerveModule.drivePercent)
+            getattr(self, f"moduleVelocity{i + 1}").append(swerveModule.getDriveVelocity())
     
     def runDataCollections(self):
         if self.driverController is not None:
@@ -100,3 +119,5 @@ class Telemetry():
             self.getMechControllerInputs()
         if self.odometryPosition is not None:
             self.getOdometryInputs()
+        if self.swerveModules is not None:
+            self.getSwerveInputs()

@@ -135,6 +135,9 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.translation = wpimath.geometry.Translation2d(location[0], location[1])
         self.distTraveled = 0
 
+        self.steerAngle = 0.0
+        self.drivePercent = 0.0
+
         #create can encoder
         self.encoder = sensors.WPI_CANCoder(self.cancoderId)
         encoderConfig = sensors.CANCoderConfiguration()
@@ -296,9 +299,12 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.setDriveVoltage(driveVoltage)
         self.steerController.setReferenceAngle(math.radians(steerAngleDeg))
 
+        self.steerAngle = math.degrees(steerAngle)
+        self.drivePercent = driveVoltage / self.kNominalVoltage
+
         if self.table:
-            self.table.putNumber("set steer deg", math.degrees(steerAngle))
-            self.table.putNumber("drive %", driveVoltage / self.kNominalVoltage)
+            self.table.putNumber("set steer deg", self.steerAngle)
+            self.table.putNumber("drive %", self.drivePercent)
 
 
     def getSteerMotor(self) -> phoenix5.WPI_TalonFX:
