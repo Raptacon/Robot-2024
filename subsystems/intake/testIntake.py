@@ -7,7 +7,7 @@ CHANCE_TO_STAY = 1
 CHANCE_FOR_HORRIBLE_ERROR = 0
 
 class IntakeStateMachine(StateMachine):
-    def __init__(self, states=[], initialState=None):
+    def __init__(self, states=[], initialState=None, debugMode=False):
         self.noteSighted = False
         self.atDest = False
 
@@ -96,7 +96,7 @@ class IntakeStateMachine(StateMachine):
         )
         states.append(fire)
 
-        super().__init__(states, initialState)
+        super().__init__(states, initialState, debugMode)
 
     #searching functions
     def searchFunc(self): 

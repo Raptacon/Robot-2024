@@ -2,11 +2,13 @@ from stateMachines.state import State
 import random
 
 class StateMachine():
-    def __init__(self, states=None, initialState=None):
+    def __init__(self, states=None, initialState=None, debugMode=False):
         self.states = states
         self.isActive = True
         self.priorityState = None
         self.lastState = None
+
+        self.debugMode = debugMode
         
         #default to some root state, could be an error handler
         self.rootState = State("ROOT_STATE", transition=lambda: str(initialState if initialState != None else states[0]))
@@ -50,7 +52,7 @@ class StateMachine():
         """
         for _state in self.states:
             if _state.name == state:
-                print(f"State changed to {_state}")
+                if self.debugMode: print(f"State changed to {_state}")
                 self.currentState = _state
 
                 try:
@@ -78,7 +80,7 @@ class StateMachine():
         """
         Reset the state to the root (transitions to whatever state[0] was if not defined)
         """
-        print("Resetting machine to root state.")
+        if self.debugMode: print("Resetting machine to root state.\n")
         self.currentState = self.rootState
 
     def enable(self):
@@ -90,7 +92,7 @@ class StateMachine():
 
             #i hate this
             self.setState(str(self.lastState))
-            print(f"Restoring state {self.lastState}\n")
+            if self.debugMode: print(f"Restoring state {self.lastState}\n")
             self.lastState = None
     
     def disable(self):
@@ -100,7 +102,7 @@ class StateMachine():
         if self.isActive == True:
             self.isActive = False
             self.lastState = self.currentState
-            print(f"Caching state {self.lastState}\n")
+            if self.debugMode: print(f"Caching state {self.lastState}\n")
             self.reset()
         
     def addState(self, state):

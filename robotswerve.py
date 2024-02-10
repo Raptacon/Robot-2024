@@ -26,7 +26,7 @@ class RobotSwerve:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.driveTrain = Drivetrain()
 
-        self.machine = IntakeStateMachine()
+        self.machine = IntakeStateMachine(debugMode=True)
         self.machine.disable()
 
         #self.driveController = wpilib.XboxController(0)
@@ -123,6 +123,7 @@ class RobotSwerve:
         
         if self.timer.advanceIfElapsed(1):
             self.machine.run()
+            print(self.machine.state)
 
         #DELETE THIS
         return
