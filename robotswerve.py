@@ -52,7 +52,7 @@ class RobotSwerve:
             self.pivot,
             lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
             lambda: self.mechController.getLeftBumper(),
-            lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
+            lambda: wpimath.applyDeadband(self.mechController.getLeftY(), 0.06),
         ))
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
