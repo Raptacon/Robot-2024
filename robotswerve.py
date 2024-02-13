@@ -50,7 +50,7 @@ class RobotSwerve:
         ))
 
         if True:
-            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain)
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.intake)
 
         self.intake.setDefaultCommand(Intake(
             self.intake,
