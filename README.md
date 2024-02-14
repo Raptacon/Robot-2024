@@ -48,7 +48,7 @@ Now that robotpy is installed, makes sure that you have the file pyproject.toml 
 
 # Design
 
-The design diagrams for the state machines can be found [here](docs/shortsStateMachine.md)
+The design diagrams for the shooter state machine can be found [here](docs/fullIntakeStateMachine.md)
 
 # Hardware for the Robot
 
