@@ -15,6 +15,8 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
+from stateMachines.testIntake import TestIntakeStateMachine
+
 import math
 kDriveControllerIdx = 0
 kMechControllerIdx = 1
@@ -28,6 +30,12 @@ class RobotSwerve:
     def __init__(self) -> None:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.mechController = wpilib.XboxController(kMechControllerIdx)
+
+        #delete this maybe?
+        #idk you are you
+        if self.driveController.isConnected() == False or self.mechController.isConnected() == False:
+            print("\n\n\nCONTROLLER NOT CONNECTED!\n\n\nRED ALERT RED ALRET\n\n\n")
+            wpilib.DriverStation.silenceJoystickConnectionWarning(True)
 
         self.driveTrain = Drivetrain()
 
@@ -50,6 +58,7 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
+
         self.intake.setDefaultCommand(Intake(
             self.intake,
             self.intakePivotController,
@@ -58,6 +67,9 @@ class RobotSwerve:
             lambda: self.mechController.getAButton(),
             lambda: self.mechController.getBButton()
         ))
+
+        self.intakeSM = TestIntakeStateMachine(intake=self.intake.getDefaultCommand())
+
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
             self.driveTrain,
@@ -112,8 +124,12 @@ class RobotSwerve:
         wpilib.SmartDashboard.putNumber("Wheel Speed", 0)
         wpilib.SmartDashboard.putNumber("Pivot Angle:", 40)
 
+        self.intakeSM.enable()
+
 
     def testPeriodic(self) -> None:
+        self.intakeSM.run()
+
         wheelAngle = wpilib.SmartDashboard.getNumber("Wheel Angle", 0)
         wheelSpeed = wpilib.SmartDashboard.getNumber("Wheel Speed", 0)
         pivotAngle = wpilib.SmartDashboard.getNumber("Pivot Angle:", 40)
@@ -126,7 +142,7 @@ class RobotSwerve:
         global lastDeg
 
 
-
+        return
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)
         match self.testChooser.getSelected():
             case "Drive Disable":

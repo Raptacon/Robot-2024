@@ -46,6 +46,11 @@ Then create a virtual environment through the command "python -m venv .venv".
 Once the environment is created run the command "pip install -r requirements.txt" to install the necessary packages to work, and run the code.
 Now that robotpy is installed, makes sure that you have the file pyproject.toml and run the command "python -m robotpy sync". 
 
+# Design
+You can find the diagram for the intake state machine [here](stateMachines/testIntakeDiagram.md)
+
+It is in a working state so don't judge it too hard or something
+
 # Hardware for the Robot
 
 ## roboRio (Gray box)

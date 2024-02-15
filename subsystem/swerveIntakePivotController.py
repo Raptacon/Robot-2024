@@ -37,7 +37,9 @@ class pivotController(commands2.SubsystemBase):
         else:
             return self.getIntakeRotation().atSetpoint()
     isPivotPositioned
-
+    #^^^
+    #what is that?
+    
     def getReqSubsystems(self) -> list[commands2.Subsystem]:
         return [self, self.getIntakeRotation()]
 

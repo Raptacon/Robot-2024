@@ -64,7 +64,7 @@ class SwerveIntakePivot(commands2.PIDSubsystem):
         if goal > self.kMaxPostion:
             print("max")
             return
-
+        
         self.goal = goal
         super().setSetpoint(self.goal)
 

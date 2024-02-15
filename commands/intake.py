@@ -28,4 +28,16 @@ class Intake(commands2.CommandBase):
             self.pivot.setGroundPickup()
         elif(self.pivotHandOff()):
             self.pivot.setHandOffPickup()
+    
+    def runIntake(self, percent):
+        self.intake.runIntake(percent)
+
+    def setGroundPickup(self):
+        self.pivot.setGroundPickup()
+
+    def setHandoffPickup(self):
+        self.pivot.setGroundPickup()
+    
+    def isAtSetpoint(self):
+        return self.pivot.isPivotPositioned()
         
