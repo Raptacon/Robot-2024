@@ -12,6 +12,8 @@ from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
 import math
+
+from wpilib import CameraServer
 kDriveControllerIdx = 0
 lastDeg =0
 
@@ -39,6 +41,8 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
+
+        CameraServer.launch()
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
