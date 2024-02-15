@@ -1,8 +1,6 @@
 ```mermaid
 flowchart TB
     subgraph Potential intake system
-        direction TB
-
         ROOT{ROOT}-->|Intake intitated|LowerIntake(Lower intake)
         LowerIntake-->LowerStandby(Standby)
         LowerStandby-->Spin(Spin intake motor)
@@ -19,7 +17,6 @@ flowchart TB
     end
 
     subgraph Potential shooter system
-        direction TB
         SHOOTER_ROOT{ROOT}-->ShooterIdle(Idle shooter position)
         ShooterIdle-->|Handshake initiated|LowerShooter(Lower shooter)
         LowerShooter-->ShooterHandshake(Shooter handshake)
