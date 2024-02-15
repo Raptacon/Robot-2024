@@ -170,6 +170,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
         self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor) 
+        self.driveEncoder.setPosition(0)
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -245,8 +246,13 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
         return math.radians(self.encoder.getAbsolutePosition())
+    
     def getDrivePosition(self):
         return self.driveEncoder.getPosition()
+    
+    def getDrivePositionMeters(self):
+        return self.driveEncoder.getPosition() / 1000
+
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
 
@@ -317,13 +323,11 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         return self.translation
 
     def getPosition(self):
-        vel = self.getDriveVelocity()
-        self.distTraveled = self.getDrivePosition()
-        print(self.distTraveled)
+        self.distTraveled = self.getDrivePositionMeters()
         ang = self.getSteerAngle()
         if self.table:
             self.table.putNumber("curr steer deg", math.degrees(ang))
-            self.table.putNumber("curr vel", vel)
+            self.table.putNumber("cur distance meters", self.distTraveled)
         return wpimath.kinematics.SwerveModulePosition(self.distTraveled, wpimath.geometry.Rotation2d(math.degrees(ang)))
 
     def disable(self, drive = True, steer = True):
