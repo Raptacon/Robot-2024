@@ -1,17 +1,5 @@
 ```mermaid
 flowchart TB
-    subgraph CURRENT SYSTEM
-        direction TB
-
-        mes(that's literally it rn. 
-        simple just to see if it correctly calls intake)
-
-        _Root[ROOT]-->_Lower(Lower intake)
-        _Lower-->_Spin(Spin intake motors)
-        _Spin-->_Raise(Raise intake)
-        _Raise-->_Done(Done :D)
-    end
-
     subgraph Potential intake system
         direction TB
 
