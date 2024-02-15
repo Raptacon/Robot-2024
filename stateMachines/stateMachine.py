@@ -96,7 +96,7 @@ class StateMachine():
             self.isActive = True
 
             #i hate this
-            if self.setState != None:
+            if self.lastState != None:
                 self.setState(str(self.lastState))
                 if self.debugMode: print(f"Restoring state {self.lastState}\n")
                 self.lastState = None
