@@ -26,7 +26,7 @@ class StateMachine():
         if not self.isActive: return
 
         #if an override state was called, set it to be active
-        if self.priorityState:
+        if self.currentState.cannotInterupt == False and self.priorityState:
             self.setState(self.priorityState)
             self.priorityState = None
 
@@ -54,7 +54,7 @@ class StateMachine():
             if _state.name == state:
                 if self.debugMode: print(f"State changed to {_state}")
                 self.currentState = _state
-
+            
                 try:
                     self.currentState.enter()
                 except Exception:

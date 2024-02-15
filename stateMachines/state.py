@@ -5,7 +5,7 @@ def evalFunc():
     return False
 
 class State():
-    def __init__(self, name:str, enter=None, run=None, transition=None) -> None:
+    def __init__(self, name:str, enter=None, run=None, transition=None, cannotInterupt=False) -> None:
         """
         Defines a state. Takes a name, enter function, and transition function
         """
@@ -14,6 +14,7 @@ class State():
         self.onEnter = enter
         self.onRun = run
         self.onTransition = transition
+        self.cannotInterupt = cannotInterupt
 
     def __str__(self) -> str:
         return self.name
@@ -21,7 +22,7 @@ class State():
     def enter(self):
         if not self.onEnter: return
         self.onEnter()
-        
+    
     def run(self):
         if self.onRun == None: return
         self.onRun()

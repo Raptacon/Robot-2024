@@ -11,7 +11,7 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
-from subsystems.intake.intake import *
+from subsystems.intake.testIntake import *
 
 import math
 kDriveControllerIdx = 0
