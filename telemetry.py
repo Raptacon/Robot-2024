@@ -1,5 +1,7 @@
 import wpilib
 import wpimath
+import math
+
 from subsystem.swerveDriveTrain import Drivetrain
 
 from wpiutil.log import (
@@ -37,7 +39,8 @@ for i in range(len(Drivetrain.kModuleProps)):
     telemetrySwerveDriveTrainEntries.extend([
         [f"steerDegree{i + 1}", FloatLogEntry, f"module{i + 1}/steerdegree"],
         [f"drivePercent{i + 1}", FloatLogEntry, f"module{i + 1}/drivepercent"],
-        [f"moduleVelocity{i + 1}", FloatLogEntry, f"module{i + 1}/velocity"]
+        [f"moduleVelocity{i + 1}", FloatLogEntry, f"module{i + 1}/velocity"],
+        [f"currSteerDegree{i + 1}", FloatLogEntry, f"module{i + 1}/currsteerdegree"]
     ])
 
 class Telemetry():    
@@ -111,6 +114,7 @@ class Telemetry():
             getattr(self, f"steerDegree{i + 1}").append(swerveModule.steerAngle)
             getattr(self, f"drivePercent{i + 1}").append(swerveModule.drivePercent)
             getattr(self, f"moduleVelocity{i + 1}").append(swerveModule.getDriveVelocity())
+            getattr(self, f"currSteerDegree{i + 1}").append(math.degrees(swerveModule.getSteerAngle()))
     
     def runDataCollections(self):
         if self.driverController is not None:
