@@ -12,8 +12,8 @@ import ntcore
 
 class Drivetrain(commands2.SubsystemBase):
     kMaxVoltage = 12.0
-    kWheelBaseMeters = 0.5461 # front to back distance
-    kTrackBaseMeters = 0.5461 # left to right distance
+    kWheelBaseMeters = 0.7112 # front to back distance
+    kTrackBaseMeters = 0.6604 # left to right distance
     #kMaxVelocityMPS = 4.14528
     kMaxVelocityMPS = 1.0
     kMaxAngularVelocityRadPS = kMaxVelocityMPS / math.hypot(kWheelBaseMeters / 2.0, kTrackBaseMeters / 2.0)
@@ -45,8 +45,9 @@ class Drivetrain(commands2.SubsystemBase):
     def __init__(self):
         super().__init__()
         self.swerveModules = []
-        datatable = ntcore.NetworkTableInstance.getDefault()
-        self.table = datatable.getTable("Drivetrain")
+        self.datatable = ntcore.NetworkTableInstance.getDefault()
+        self.table = self.datatable.getTable("Drivetrain")
+        self.posTable = self.datatable.getTable("Robot position")
         assert(self.table)
         for module in Drivetrain.kModuleProps:
             name = module["name"]
@@ -133,12 +134,29 @@ class Drivetrain(commands2.SubsystemBase):
         for mod, state in zip(self.swerveModules, swerveModuleStates):
             mod.setSwerveModuleState(state, self.kMaxVelocityMPS)
 
+        self.updateOdometry()
+
     def updateOdometry(self):
-        self.odometry.update(self.getHeading(),
+         self.pos = self.odometry.update(self.getHeading(),
+                             (self.swerveModules[1].getPosition(),
+                             self.swerveModules[3].getPosition(),
+                             self.swerveModules[0].getPosition(),
+                             self.swerveModules[2].getPosition()))
+         if self.posTable:
+            self.posTable.putNumber("Robot_PosX", self.pos.translation().x_feet)
+            self.posTable.putNumber("Robot_PosY", self.pos.translation().y_feet)
+            self.posTable.putNumber("Robot_Angle", self.pos.translation().angle().degrees())
+         else:
+            self.posTable = self.datatable.getTable("Robot position")
+
+    def resetOdometry(self):
+        self.odometry.resetPosition(self.getHeading(),
                              self.swerveModules[0].getPosition(),
                              self.swerveModules[1].getPosition(),
                              self.swerveModules[2].getPosition(),
-                             self.swerveModules[3].getPosition())
+                             self.swerveModules[3].getPosition(),
+                             self.odometry.getPose())
+        
     def disable(self, steer = True, drive = True):
         for m in self.swerveModules:
             m.disable(steer, drive)

@@ -13,6 +13,7 @@ from commands.intake import Intake
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
+from telemetry import Telemetry
 
 import math
 kDriveControllerIdx = 0
@@ -47,6 +48,10 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
+
+        if True:
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.intake)
+
         self.intake.setDefaultCommand(Intake(
             self.intake,
             self.pivot,
@@ -63,7 +68,10 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))'''
 
-
+    def robotPeriodic(self) -> None:
+        if self.telemetry:
+            self.telemetry.runDataCollections()
+        
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
         pass
@@ -93,7 +101,7 @@ class RobotSwerve:
         """This function is called periodically during operator control"""
         pass
 
-    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", "Wheel Pos"]
+    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", "Wheel Pos", "Pivot Rot"]
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
@@ -106,11 +114,13 @@ class RobotSwerve:
         wpilib.SmartDashboard.putData("Test Mode", self.testChooser)
         wpilib.SmartDashboard.putNumber("Wheel Angle", 0)
         wpilib.SmartDashboard.putNumber("Wheel Speed", 0)
+        wpilib.SmartDashboard.putNumber("Pivot Angle:", 40)
 
 
     def testPeriodic(self) -> None:
         wheelAngle = wpilib.SmartDashboard.getNumber("Wheel Angle", 0)
         wheelSpeed = wpilib.SmartDashboard.getNumber("Wheel Speed", 0)
+        pivotAngle = wpilib.SmartDashboard.getNumber("Pivot Angle:", 40)
         wheelAngle #"use" value
         wheelSpeed #"use" value
         self.driveTrain.getCurrentAngles()
@@ -118,8 +128,6 @@ class RobotSwerve:
         LeftY = wpimath.applyDeadband(self.driveController.getLeftY(), 0.02)
         RightY = wpimath.applyDeadband(self.driveController.getRightY(), 0.1)
         global lastDeg
-
-
 
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)
         match self.testChooser.getSelected():
@@ -151,6 +159,8 @@ class RobotSwerve:
                 self.driveTrain.calWheels(False)
             case "Wheel Pos":
                 self.driveTrain.setSteer(wheelAngle)
+            case "Pivot Rot":
+                self.intakePivotController.setManipulator(pivotAngle)
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
