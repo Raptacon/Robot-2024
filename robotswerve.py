@@ -8,12 +8,12 @@ import commands2.button
 from subsystem.swerveDriveTrain import Drivetrain
 from subsystem.swerveIntake import SwerveIntake
 from subsystem.swerveIntakePivot import SwerveIntakePivot
-from subsystem.swerveIntakePivotController import pivotController
 
 from commands.intake import Intake
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
+from telemetry import Telemetry
 
 import math
 kDriveControllerIdx = 0
@@ -33,8 +33,6 @@ class RobotSwerve:
 
         self.intake = SwerveIntake()
         self.pivot = SwerveIntakePivot()
-        self.intakePivotController = pivotController()
-        self.intakePivotController.setIntakeRotationSubsystem(self.pivot)
         #self.driveController = wpilib.XboxController(0)
 
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -50,13 +48,16 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
+
+        if True:
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.intake)
+
         self.intake.setDefaultCommand(Intake(
             self.intake,
-            self.intakePivotController,
+            self.pivot,
             lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
             lambda: self.mechController.getLeftBumper(),
-            lambda: self.mechController.getAButton(),
-            lambda: self.mechController.getBButton()
+            lambda: wpimath.applyDeadband(self.mechController.getLeftY(), 0.06),
         ))
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
@@ -67,7 +68,10 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))'''
 
-
+    def robotPeriodic(self) -> None:
+        if self.telemetry:
+            self.telemetry.runDataCollections()
+        
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
         pass

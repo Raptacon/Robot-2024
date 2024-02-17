@@ -8,7 +8,6 @@ import wpimath.controller
 import rev
 import logging as log
 
-
 from .steerController import SteerController
 import ntcore
 
@@ -136,6 +135,9 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.translation = wpimath.geometry.Translation2d(location[0], location[1])
         self.distTraveled = 0
 
+        self.steerAngle = 0.0
+        self.drivePercent = 0.0
+
         #create can encoder
         self.encoder = sensors.WPI_CANCoder(self.cancoderId)
         encoderConfig = sensors.CANCoderConfiguration()
@@ -170,7 +172,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+        self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor) 
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -247,6 +249,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
         return math.radians(self.encoder.getAbsolutePosition())
+    def getDrivePosition(self):
+        return self.driveEncoder.getPosition()
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
 
@@ -296,9 +300,12 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.setDriveVoltage(driveVoltage)
         self.steerController.setReferenceAngle(math.radians(steerAngleDeg))
 
+        self.steerAngle = math.degrees(steerAngle)
+        self.drivePercent = driveVoltage / self.kNominalVoltage
+
         if self.table:
-            self.table.putNumber("set steer deg", math.degrees(steerAngle))
-            self.table.putNumber("drive %", driveVoltage / self.kNominalVoltage)
+            self.table.putNumber("set steer deg", self.steerAngle)
+            self.table.putNumber("drive %", self.drivePercent)
 
 
     def getSteerMotor(self) -> phoenix5.WPI_TalonFX:
@@ -318,9 +325,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
 
     def getPosition(self):
         vel = self.getDriveVelocity()
-
-        # calculate total distance traveled
-        self.distTraveled += vel * .02
+        self.distTraveled = self.getDrivePosition()
+        print(self.distTraveled)
         ang = self.getSteerAngle()
         if self.table:
             self.table.putNumber("curr steer deg", math.degrees(ang))
