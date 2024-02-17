@@ -171,6 +171,8 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
         self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor) 
         self.driveEncoder.setPosition(0)
+        self.driveEncoder.setPositionConversionFactor(self.driveSensorPositionCoefficient)
+        self.driveEncoder.setVelocityConversionFactor(self.driveSensorVelocityCoefficient)
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -243,6 +245,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     def getDriveVelocity(self):
         '''gets module drive voltage (speed)'''
         return self.driveEncoder.getVelocity() * self.driveSensorVelocityCoefficient
+    
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
         return math.radians(self.encoder.getAbsolutePosition())
@@ -250,9 +253,6 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     def getDrivePosition(self):
         return self.driveEncoder.getPosition()
     
-    def getDrivePositionMeters(self):
-        return self.driveEncoder.getPosition() / 1000
-
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
 
@@ -321,15 +321,25 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         return self.steerController
     def getTranslation(self) -> wpimath.geometry.Translation2d:
         return self.translation
+    
+    def resetDistance(self):
+        self.driveEncoder.setPosition(0)
 
-    def getPosition(self):
-        self.distTraveled = self.getDrivePositionMeters()
+    def getPosition(self) -> wpimath.kinematics.SwerveModulePosition:
+        self.distTraveled = self.getDrivePosition()
         ang = self.getSteerAngle()
         if self.table:
             self.table.putNumber("curr steer deg", math.degrees(ang))
             self.table.putNumber("cur distance meters", self.distTraveled)
-        return wpimath.kinematics.SwerveModulePosition(self.distTraveled, wpimath.geometry.Rotation2d(math.degrees(ang)))
-
+        return wpimath.kinematics.SwerveModulePosition(self.distTraveled, wpimath.geometry.Rotation2d(ang))
+    
+    def getVelocity(self) -> wpimath.kinematics.SwerveModuleState:
+        self.velocity = self.getDriveVelocity()
+        ang = self.getSteerAngle()
+        if(self.table):
+            self.table.putNumber("curr velocity", self.velocity)
+        return wpimath.kinematics.SwerveModuleState(self.velocity, wpimath.geometry.Rotation2d(ang))
+    
     def disable(self, drive = True, steer = True):
         if drive:
             self.driveMotor.disable()

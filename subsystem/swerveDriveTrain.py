@@ -4,7 +4,8 @@ from swerve.swerveModule import SwerveModuleMk4L1SparkMaxFalcCanCoder as SwerveM
 import commands2
 import wpimath.kinematics
 import wpimath.geometry
-from wpimath.geometry._geometry import Rotation2d
+from wpimath.geometry import Rotation2d
+from wpimath.geometry import Pose2d
 import math
 import wpilib
 
@@ -44,7 +45,7 @@ class Drivetrain(commands2.SubsystemBase):
 #61 - 34.717
     def __init__(self):
         super().__init__()
-        self.swerveModules = []
+        self.swerveModules = list[SwerveModule]()
         self.datatable = ntcore.NetworkTableInstance.getDefault()
         self.table = self.datatable.getTable("Drivetrain")
         self.posTable = self.datatable.getTable("Robot position")
@@ -80,12 +81,12 @@ class Drivetrain(commands2.SubsystemBase):
         self.ang = 0
         self.iteration = 0
 
-
     def getHeading(self) -> Rotation2d:
         return Rotation2d.fromDegrees(self.imu.getFusedHeading() - self.headingOffset)
 
     def resetHeading(self):
         self.headingOffset = self.imu.getFusedHeading()
+        self.resetOdometry()
 
     def drive(self, xSpeed: float, ySpeed: float, rot: float, fieldRelative: bool):
         #convert to proper units
@@ -137,25 +138,29 @@ class Drivetrain(commands2.SubsystemBase):
         self.updateOdometry()
 
     def updateOdometry(self):
-         self.pos = self.odometry.update(self.getHeading(),
-                             (self.swerveModules[1].getPosition(),
-                             self.swerveModules[3].getPosition(),
-                             self.swerveModules[0].getPosition(),
-                             self.swerveModules[2].getPosition()))
-         if self.posTable:
-            self.posTable.putNumber("Robot_PosX", self.pos.translation().x_feet)
-            self.posTable.putNumber("Robot_PosY", self.pos.translation().y_feet)
-            self.posTable.putNumber("Robot_Angle", self.pos.translation().angle().degrees())
-         else:
+        self.pos = self.odometry.update(self.getHeading(),
+                            [self.swerveModules[1].getPosition(),
+                            self.swerveModules[3].getPosition(),
+                            self.swerveModules[0].getPosition(),
+                            self.swerveModules[2].getPosition()])
+         
+        if self.posTable:
+            self.posTable.putNumber("Robot_PosX", self.pos.Y())
+            self.posTable.putNumber("Robot_PosY", self.pos.X()) #Not sure why, but the X and Y are flipped.
+            self.posTable.putNumber("odom angle", self.pos.rotation().degrees())
+            self.posTable.putNumber("actual angle", self.getHeading().degrees())
+        else:
             self.posTable = self.datatable.getTable("Robot position")
+
 
     def resetOdometry(self):
         self.odometry.resetPosition(self.getHeading(),
-                             self.swerveModules[0].getPosition(),
-                             self.swerveModules[1].getPosition(),
-                             self.swerveModules[2].getPosition(),
-                             self.swerveModules[3].getPosition(),
-                             self.odometry.getPose())
+                            [self.swerveModules[1].getPosition(),
+                            self.swerveModules[3].getPosition(),
+                            self.swerveModules[0].getPosition(),
+                            self.swerveModules[2].getPosition()],
+                            Pose2d()
+                            )
         
     def disable(self, steer = True, drive = True):
         for m in self.swerveModules:
@@ -173,7 +178,6 @@ class Drivetrain(commands2.SubsystemBase):
             wpilib.SmartDashboard.putNumber(f"{m.cancoderId}Pos", angle)
             angles.append(angle)
         return angles
-
 
     def setDrive(self, speedPercent: float):
         for m in self.swerveModules:
