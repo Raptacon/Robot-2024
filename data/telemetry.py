@@ -55,7 +55,7 @@ class Telemetry():
         self.odometryPosition = driveTrain.odometry
         self.swerveModules = driveTrain.swerveModules
 
-        self.datalog = DataLog("log")
+        self.datalog = DataLog("data/log")
         for entryname, entrytype, logname in telemetryButtonEntries:
             setattr(self, "driver" + entryname, entrytype(self.datalog, "driver/" + logname))
             setattr(self, "mech" + entryname, entrytype(self.datalog, "mech/" + logname))

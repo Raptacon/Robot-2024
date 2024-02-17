@@ -10,7 +10,7 @@ from subsystem.swerveDriveTrain import Drivetrain
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
-from telemetry import Telemetry
+from data.telemetry import Telemetry
 
 import math
 kDriveControllerIdx = 0
