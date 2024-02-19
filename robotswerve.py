@@ -11,6 +11,8 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
+from auto import Autonomous
+
 import math
 kDriveControllerIdx = 0
 lastDeg =0
@@ -29,16 +31,6 @@ class RobotSwerve:
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
         self.yLimiter = wpimath.filter.SlewRateLimiter(3)
         self.rotLimiter = wpimath.filter.SlewRateLimiter(3)
-
-        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
-        commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
-        self.driveTrain.setDefaultCommand(DefaultDrive(
-            self.driveTrain,
-            lambda: wpimath.applyDeadband(self.driveController.getLeftX(), 0.06),
-            lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
-            lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
-            lambda: self.driveTrain.getFieldDriveRelative()
-        ))
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
@@ -59,21 +51,28 @@ class RobotSwerve:
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        #self.autonomousCommand = self.container.getAutonomousCommand()
+        self.autonomousCommand = self.getAutonomousCommand()
 
-        #if self.autonomousCommand:
-        #    self.autonomousCommand.schedule()
-        pass
+        if self.autonomousCommand:
+            self.autonomousCommand.schedule()
+
+    def getAutonomousCommand(self):
+        return Autonomous(self.driveTrain)
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
 
     def teleopInit(self) -> None:
-        # This makes sure that the autonomous stops running when
-        # teleop starts running. If you want the autonomous to
-        # continue until interrupted by another command, remove
-        # this line or comment it out.
-        pass
+        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
+
+        self.driveTrain.setDefaultCommand(DefaultDrive(
+            self.driveTrain,
+            lambda: wpimath.applyDeadband(self.driveController.getLeftX(), 0.06),
+            lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
+            lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
+            lambda: self.driveTrain.getFieldDriveRelative()
+        ))
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
@@ -101,9 +100,9 @@ class RobotSwerve:
         wheelAngle #"use" value
         wheelSpeed #"use" value
         self.driveTrain.getCurrentAngles()
-        LeftX = wpimath.applyDeadband(self.driveController.getLeftX(), 0.02)
-        LeftY = wpimath.applyDeadband(self.driveController.getLeftY(), 0.02)
-        RightY = wpimath.applyDeadband(self.driveController.getRightY(), 0.1)
+        #LeftX = wpimath.applyDeadband(self.driveController.getLeftX(), 0.02)
+        #LeftY = wpimath.applyDeadband(self.driveController.getLeftY(), 0.02)
+        #RightY = wpimath.applyDeadband(self.driveController.getRightY(), 0.1)
         global lastDeg
 
 
@@ -117,19 +116,9 @@ class RobotSwerve:
                 self.driveTrain.disable()
             case "Wheels Select":
                 #self.driveTrain.setSteer(wheelAngle)
-                ang = (math.degrees(math.atan2(LeftY, LeftX)) +90.0) %360.0
-                if(abs(LeftX) < 0.8 and abs(LeftY) < 0.8):
-                    pass
-                    print("pass")
-                    self.driveTrain.setSteer(ang)
-                    self.driveTrain.setDrive(RightY)
-                else:
-                    print(f"Set {ang}")
-                    lastDeg = ang
-                    self.driveTrain.setSteer(ang)
-                    self.driveTrain.setDrive(RightY)
+                self.driveTrain.setSteer(wheelAngle)
             case "Wheels Drive":
-                self.driveTrain.setDrive(RightY)
+                self.driveTrain.setDrive(wheelSpeed)
             case "Enable Cal":
                 if not self.calEn:
                     self.driveTrain.calWheels(True)

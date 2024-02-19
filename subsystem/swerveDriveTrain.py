@@ -77,6 +77,7 @@ class Drivetrain(commands2.SubsystemBase):
 
         self.headingOffset = 0
         self.odometry = wpimath.kinematics.SwerveDrive4Odometry(self.kinematics, self.getHeading(), self.moduleRotations)
+        self.pos = Pose2d()
         self.setFieldDriveRelative(True)
         self.ang = 0
         self.iteration = 0
@@ -92,7 +93,6 @@ class Drivetrain(commands2.SubsystemBase):
         #convert to proper units
         #actually don't
         rot = rot# * 180.0
-
         #print(f"drive: x {xSpeed}, y {ySpeed}, rot {rot}, field {fieldRelative}")
         #xSpeed = 0.0
         #ySpeed = 0.0
@@ -146,12 +146,11 @@ class Drivetrain(commands2.SubsystemBase):
          
         if self.posTable:
             self.posTable.putNumber("Robot_PosX", self.pos.Y())
-            self.posTable.putNumber("Robot_PosY", self.pos.X()) #Not sure why, but the X and Y are flipped.
+            self.posTable.putNumber("Robot_PosY", self.pos.X())
             self.posTable.putNumber("odom angle", self.pos.rotation().degrees())
             self.posTable.putNumber("actual angle", self.getHeading().degrees())
         else:
             self.posTable = self.datatable.getTable("Robot position")
-
 
     def resetOdometry(self):
         self.odometry.resetPosition(self.getHeading(),
@@ -161,6 +160,9 @@ class Drivetrain(commands2.SubsystemBase):
                             self.swerveModules[2].getPosition()],
                             Pose2d()
                             )
+        
+    def getPos(self) -> Pose2d:
+        return self.pos
         
     def disable(self, steer = True, drive = True):
         for m in self.swerveModules:

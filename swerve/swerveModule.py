@@ -96,8 +96,6 @@ class SwerveModuleMK4I_L2Consts(SwerveModuleConsts):
         self._steerInverted = True
         self._moduleType = "Mk4I_L2"
 
-
-
 class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
     '''
     Module for Mk4L1 with 2 brushless neos and a cancoder swerve drive
@@ -166,10 +164,11 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         if status != phoenix5.ErrorCode.OK:
             raise RuntimeError(f"Failed to configure Drive Motor on id {self.driveId}. Error {status}")
         self.driveMotor.enableVoltageCompensation(12.0)
+        self.driveMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor) 
+        self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor)
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.driveSensorPositionCoefficient)
         self.driveEncoder.setVelocityConversionFactor(self.driveSensorVelocityCoefficient)
@@ -184,6 +183,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.steerSensorPositionCoefficient = 2.0 * math.pi / self.kTicksPerRotation * self.consts.getSteerReduction()
         self.steerSensorVelocityCoefficient = self.steerSensorPositionCoefficient * 10.0
         self.steerMotor = rev.CANSparkMax(self.steerId, rev.CANSparkLowLevel.MotorType.kBrushless)
+        self.steerMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         self.steerEncoder = self.encoder
 
         # motorConfig = ctre.TalonFXConfiguration()
