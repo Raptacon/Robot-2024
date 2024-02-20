@@ -1,10 +1,10 @@
 import commands2
 from subsystem.swerveShooter import SwerveShooter
-from subsystem.swerveShooterPivot import SwerveShooterPivot
+from subsystem.swerveShooterPivotController import shooterPivotController
 import typing
 
 class Shooter(commands2.CommandBase):
-    def __init__(self, shooter : SwerveShooter, intaking : typing.Callable[[], bool], outaking : typing.Callable[[], bool], shooterSpeed : typing.Callable[[], float], pivot : SwerveShooterPivot, pivotSpeed : typing.Callable[[], float]):
+    def __init__(self, shooter : SwerveShooter, intaking : typing.Callable[[], bool], outaking : typing.Callable[[], bool], shooterSpeed : typing.Callable[[], float], pivotController : shooterPivotController, changePivot : typing.Callable[[], bool]):
         super().__init__()
 
         self.shooter = shooter
@@ -12,10 +12,12 @@ class Shooter(commands2.CommandBase):
         self.outaking = outaking
         self.shooterSpeed = shooterSpeed
 
-        self.pivot = pivot
-        self.pivotSpeed = pivotSpeed
+        self.pivotController = pivotController
 
-        self.addRequirements(self.shooter, self.pivot)
+        self.rotatePivot = False
+        self.changePivot = changePivot
+
+        self.addRequirements(self.shooter, self.pivotController)
 
     def execute(self):
         if(self.intaking()):
@@ -25,6 +27,12 @@ class Shooter(commands2.CommandBase):
         else:
             self.shooter.runIntake(0)
 
+        if(self.changePivot()):
+            self.rotatePivot = not self.rotatePivot
+
         self.shooter.runShooters(self.shooterSpeed())
 
-        self.pivot.runPivot(self.pivotSpeed())
+        if(self.rotatePivot):
+            self.pivotController.setAmpShoot()
+        else:
+            self.pivotController.setHandOffPickup()  

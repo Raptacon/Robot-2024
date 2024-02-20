@@ -15,12 +15,15 @@ from subsystem.swerveIntakePivotController import pivotController
 from commands.shooter import Shooter
 from subsystem.swerveShooter import SwerveShooter
 from subsystem.swerveShooterPivot import SwerveShooterPivot
+from subsystem.swerveShooterPivotController import shooterPivotController
 
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
 import math
+
+from wpilib import DigitalInput
 kDriveControllerIdx = 0
 kMechControllerIdx = 1
 lastDeg =0
@@ -40,10 +43,13 @@ class RobotSwerve:
         self.pivot = SwerveIntakePivot()
         self.intakePivotController = pivotController()
         self.intakePivotController.setIntakeRotationSubsystem(self.pivot)
+        self.intakePivotController.calibrate()
 
         self.shooter = SwerveShooter()
         self.shooterPivot = SwerveShooterPivot()
-        self.intakePivotController.calibrate()
+        self.shooterPivotController = shooterPivotController()
+        self.shooterPivotController.setShooterRotationSubsystem(self.shooterPivot)
+        self.shooterPivotController.calibrate()
         #self.driveController = wpilib.XboxController(0)
 
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -71,8 +77,8 @@ class RobotSwerve:
             lambda: self.mechController.getRightBumper(),
             lambda: self.mechController.getBButton(),
             lambda: self.mechController.getRightTriggerAxis(),
-            self.shooterPivot,
-            lambda: wpimath.applyDeadband(self.mechController.getRightY(), 0.05)
+            self.shooterPivotController,
+            lambda: wpimath.applyDeadband(self.mechController.getYButtonPressed(), 0.05)
             ))
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
@@ -113,7 +119,7 @@ class RobotSwerve:
         """This function is called periodically during operator control"""
         pass
 
-    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", "Wheel Pos", "Pivot Rot", "Shooter Cal"]
+    testModes = ["Drive Disable", "Wheels Select", "Wheels Drive", "Enable Cal", "Disable Cal", "Wheel Pos", "Pivot Rot", "Shooter Cal", "Break Beam"]
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
@@ -127,14 +133,14 @@ class RobotSwerve:
         wpilib.SmartDashboard.putNumber("Wheel Angle", 0)
         wpilib.SmartDashboard.putNumber("Wheel Speed", 0)
         wpilib.SmartDashboard.putNumber("Pivot Angle:", 40)
-        wpilib.SmartDashboard.putNumber("Shooter Angle:", 310)
-
+        wpilib.SmartDashboard.putNumber("Shooter Angle:", 60)
+        self.breakBeam = DigitalInput(2)
 
     def testPeriodic(self) -> None:
         wheelAngle = wpilib.SmartDashboard.getNumber("Wheel Angle", 0)
         wheelSpeed = wpilib.SmartDashboard.getNumber("Wheel Speed", 0)
         pivotAngle = wpilib.SmartDashboard.getNumber("Pivot Angle:", 40)
-        shooterAngle = wpilib.SmartDashboard.putNumber("Shooter Angle:", 310)
+        shooterAngle = wpilib.SmartDashboard.getNumber("Shooter Angle:", 60)
         wheelAngle #"use" value
         wheelSpeed #"use" value
         self.driveTrain.getCurrentAngles()
@@ -174,7 +180,10 @@ class RobotSwerve:
             case "Wheel Pos":
                 self.driveTrain.setSteer(wheelAngle)
             case "Pivot Rot":
-                self.intakePivotController.setManipulator(pivotAngle)
+                self.shooterPivotController.setManipulator(shooterAngle)
+            case "Break Beam":
+                #print(f"Break Beam: {self.breakBeam.get()}")
+                pass
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
