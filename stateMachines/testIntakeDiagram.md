@@ -1,5 +1,5 @@
 ```mermaid
-graph TB
+flowchart TB
     subgraph CURRENT SYSTEM
         direction TB
         message(that's literally it rn. 
