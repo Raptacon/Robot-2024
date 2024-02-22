@@ -1,5 +1,16 @@
 ```mermaid
-flowchart TB
+graph TB
+    subgraph CURRENT SYSTEM
+        direction TB
+        message(that's literally it rn. 
+        simple just to see if it correctly calls intake)
+
+        _Root[ROOT]-->_Lower(Lower intake)
+        _Lower-->_Spin(Spin intake motors)
+        _Spin-->_Raise(Raise intake)
+        _Raise-->_Done(Done :D)
+    end
+
     subgraph Potential intake system
         ROOT{ROOT}-->|Intake intitated|LowerIntake(Lower intake)
         LowerIntake-->LowerStandby(Standby)
@@ -17,6 +28,7 @@ flowchart TB
     end
 
     subgraph Potential shooter system
+        direction TB
         SHOOTER_ROOT{ROOT}-->ShooterIdle(Idle shooter position)
         ShooterIdle-->|Handshake initiated|LowerShooter(Lower shooter)
         LowerShooter-->ShooterHandshake(Shooter handshake)

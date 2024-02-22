@@ -1,13 +1,14 @@
 from stateMachines.stateMachine import *
 import wpilib
 
+#stateMachines\testIntakeDiagram.md
 class TestIntakeStateMachine(StateMachine):
-    def __init__(self, states=None, initialState=None, debugMode=False, intake=None, timer=None):
+    def __init__(self, states=[], initialState=None, debugMode=False, intake=None):
+
+        if intake == None:
+            raise Exception("Must include intake in intake state machine!")
         
-        # if intake == None:
-        #     raise Exception("Must include intake in intake state machine!")
-        
-        # self.intake = intake
+        self.intake = intake
 
         self.debugTimer = wpilib.Timer()
         self.debugTimer.start()
@@ -48,13 +49,14 @@ class TestIntakeStateMachine(StateMachine):
         
         spinIntakeMotor = State(    
             name="SpinIntakeMotor",
-            transition=lambda: "RaiseIntake" if self.debugTimer.advanceIfElapsed(3) else ""
+            run=lambda: print("Spinning"),
+            transition=lambda: "RaiseIntake" if self.debugTimer.advanceIfElapsed(0.5) else ""
         )
         states.append(spinIntakeMotor)
         
         raiseIntake = State(
             name="RaiseIntake",
-            transition=lambda: "DoneState" if self.debugTimer.advanceIfElapsed(2) else ""
+            transition=lambda: "DoneState" if self.debugTimer.advanceIfElapsed(3) else ""
         )
         states.append(raiseIntake)
 
@@ -62,3 +64,7 @@ class TestIntakeStateMachine(StateMachine):
         states.append(doneState)
 
         super().__init__(states, initialState, debugMode)
+    
+    def enable(self):
+        self.debugTimer.reset()
+        return super().enable()
