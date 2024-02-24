@@ -26,6 +26,8 @@ from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
 import math
+
+from wpilib import CameraServer
 kDriveControllerIdx = 0
 kMechControllerIdx = 1
 lastDeg =0
@@ -83,6 +85,8 @@ class RobotSwerve:
             lambda: self.mechController.getRightTriggerAxis(),
             self.mechController.getYButtonPressed
             ))
+
+        CameraServer.launch()
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(
