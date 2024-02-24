@@ -1,6 +1,4 @@
 import commands2
-import rev
-import utils.sparkMaxUtils
 import wpilib
 
 class Leds(commands2.Subsystem):
