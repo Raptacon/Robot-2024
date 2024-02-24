@@ -97,7 +97,10 @@ jobs:
       #       # To report GitHub Actions status checks
       #       statuses: write
   SuperLinter:
-    on: ["never"]
+    on:
+      pull_request:
+        branches:
+          - Disabled
     name: Super Linter
     runs-on: ubuntu-latest
     steps:
