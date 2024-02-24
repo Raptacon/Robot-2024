@@ -2,7 +2,7 @@ import commands2
 import wpilib
 
 class Leds(commands2.Subsystem):
-    kLEDBuffer = 9 #one side temp
+    kLEDBuffer = 18 #one side temp
     def __init__(self):
         self.leds = wpilib.AddressableLED(0)
         self.ledData = [wpilib.AddressableLED.LEDData() for _ in range(self.kLEDBuffer)]
