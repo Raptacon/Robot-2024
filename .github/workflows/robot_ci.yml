@@ -96,7 +96,7 @@ jobs:
       #       packages: read
       #       # To report GitHub Actions status checks
       #       statuses: write
-  SuperLinter:
+  .SuperLinter:
     name: Super Linter
     runs-on: ubuntu-latest
     steps:
