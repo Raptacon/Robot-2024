@@ -36,10 +36,10 @@ lint: ## Runs the linter(s)
 	${VENVBIN}/flake8 . --count --select=E9,F6,F7,F8,F4,W1,W2,W4,W5,W6,E11 --ignore W293,W503 --show-source --statistics --exclude */tests/pyfrc*,utils/yaml/*,.venv*/,venv*/
 
 test: setup_${VENV} lint  ## Does a lint and then test
-	${VENVBIN}/${PYTHON} robot.py test
+	${VENVBIN}/${PYTHON} -m robotpy test
 
 coverage: setup_${VENV} test
-	${VENVBIN}/${PYTHON} robot.py coverage test
+	${VENVBIN}/${PYTHON} -m robotpy coverage test
 
 setup_${VENV}: ${VENV}
 	${VENVBIN}/${PYTHON} -m pip install --upgrade pip setuptools
@@ -59,4 +59,4 @@ docker_build:
 	docker build . --tag raptacon2022_build
 
 deploy:
-	${PYTHON} robot.py deploy --no-resolve --robot 10.32.0.2
+	${PYTHON} -m robotpy deploy 
