@@ -7,6 +7,7 @@ import wpimath.kinematics
 import wpimath.controller
 import rev
 import logging as log
+import utils.sparkMaxUtils
 
 from .steerController import SteerController
 import ntcore
@@ -98,7 +99,7 @@ class SwerveModuleMK4I_L2Consts(SwerveModuleConsts):
 
 
 
-class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
+class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
     '''
     Module for Mk4L1 with 2 brushless neos and a cancoder swerve drive
     '''
@@ -134,6 +135,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.table = table
         self.translation = wpimath.geometry.Translation2d(location[0], location[1])
         self.distTraveled = 0
+        self.driveVoltage = 0.0
 
         self.steerAngle = 0.0
         self.drivePercent = 0.0
@@ -162,6 +164,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         motorConfig.supplyCurrLimit = supplyCurrConfig
 
         self.driveMotor = rev.CANSparkMax(self.driveId, rev.CANSparkLowLevel.MotorType.kBrushless)
+        utils.sparkMaxUtils.configureSparkMaxCanRates(self.driveMotor)
         self.driveMotor.setInverted(inverted)
 
         # status = self.driveMotor.configAllSettings(motorConfig, 250)
@@ -184,6 +187,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         self.steerSensorPositionCoefficient = 2.0 * math.pi / self.kTicksPerRotation * self.consts.getSteerReduction()
         self.steerSensorVelocityCoefficient = self.steerSensorPositionCoefficient * 10.0
         self.steerMotor = rev.CANSparkMax(self.steerId, rev.CANSparkLowLevel.MotorType.kBrushless)
+        utils.sparkMaxUtils.configureSparkMaxCanRates(self.steerMotor)
         self.steerEncoder = self.encoder
 
         # motorConfig = ctre.TalonFXConfiguration()
@@ -221,6 +225,7 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
             raise RuntimeError(f"Failed to configure Steer Motor Status Frame on id {self.driveId}. Error {status}")
 
         self.steerController = SteerController(self)
+        
 
     def getAbsoluteAngle(self) -> float:
         """gets the last abs angle encoder value radians"""
@@ -296,15 +301,16 @@ class SwerveModuleMk4L1SparkMaxFalcCanCoder() :
         if steerAngle < 0.0:
             steerAngle += 2.0 * math.pi
 
-        self.setDriveVoltage(driveVoltage)
+        self.driveVoltage = driveVoltage
+        self.setDriveVoltage(self.driveVoltage)
         self.steerController.setReferenceAngle(math.radians(steerAngleDeg))
 
         self.steerAngle = math.degrees(steerAngle)
         self.drivePercent = driveVoltage / self.kNominalVoltage
 
         if self.table:
-            self.table.putNumber("set steer deg", self.steerAngle)
-            self.table.putNumber("drive %", self.drivePercent)
+            self.table.putNumber("set steer deg", math.degrees(steerAngle))
+            self.table.putNumber("drive %", driveVoltage / self.kNominalVoltage)
 
 
     def getSteerMotor(self) -> phoenix5.WPI_TalonFX:
