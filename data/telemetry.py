@@ -45,8 +45,10 @@ for i in range(len(Drivetrain.kModuleProps)):
 
 driverStationEntries = [
     ["alliance", StringLogEntry, "alliance"],
-    ["autonomous", BooleanLogEntry, "autonomous"]
-
+    ["autonomous", BooleanLogEntry, "autonomous"],
+    ["teleop", BooleanLogEntry, "teleop"],
+    ["test", BooleanLogEntry, "test"],
+    ["enabled", BooleanLogEntry, "enabled"]
 ]
 
 class Telemetry():    
@@ -153,6 +155,9 @@ class Telemetry():
             alliance = "Red"
         self.alliance.append(alliance)
         self.autonomous.append(self.driverStation.isAutonomous())
+        self.teleop.append(self.driverStation.isTeleop())
+        self.test.append(self.driverStation.isTest())
+        self.enabled.append(self.driverStation.isEnabled())
 
     def runDataCollections(self):
         if self.driverController is not None:
