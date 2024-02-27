@@ -25,5 +25,4 @@ class SparkyShoot(commands2.SequentialCommandGroup):
             commands2.PrintCommand("Running Shooter"),
             HandOff(shooter, intake, 3, 1),
             commands2.PrintCommand("Finished Shooter"),
-            GoToDist(Pose2d(0, 2, 0), drive),
         )
