@@ -1,5 +1,5 @@
 import navx
-from swerve.swerveModule import SwerveModuleMk4L1SparkMaxFalcCanCoder as SwerveModule
+from swerve.swerveModule import SwerveModuleMk4L1SparkMaxNeoCanCoder as SwerveModule
 
 import commands2
 import wpimath.kinematics
@@ -13,17 +13,17 @@ import ntcore
 
 class Drivetrain(commands2.SubsystemBase):
     kMaxVoltage = 12.0
-    kWheelBaseMeters = 0.5461 # front to back distance
-    kTrackBaseMeters = 0.5461 # left to right distance
+    kWheelBaseMeters = 0.7112 # front to back distance
+    kTrackBaseMeters = 0.6604 # left to right distance
     #kMaxVelocityMPS = 4.14528
     kMaxVelocityMPS = 1.0
     kMaxAngularVelocityRadPS = kMaxVelocityMPS / math.hypot(kWheelBaseMeters / 2.0, kTrackBaseMeters / 2.0)
 
     kModuleProps = [
-            {"name": "frontLeft", "channel": 50, "encoderCal": 31.992, "trackbase": kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False },
-            {"name": "frontRight", "channel": 53, "encoderCal": 153.193, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": True },
-            {"name": "rearLeft", "channel": 56, "encoderCal": -23.555, "trackbase": kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": False },
-            {"name": "rearRight", "channel": 59, "encoderCal": 34.717, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": True }
+            {"name": "frontLeft", "channel": 50, "encoderCal": 83.496, "trackbase": kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False,  },
+            {"name": "frontRight", "channel": 53, "encoderCal": 356.396, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False },
+            {"name": "rearLeft", "channel": 56, "encoderCal": 50.098, "trackbase": kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": False },
+            {"name": "rearRight", "channel": 59, "encoderCal": 69.785, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": False  }
     ]
     kModulePropsNoCal = [
             {"name": "frontLeft", "channel": 50, "encoderCal": 0.0, "trackbase": kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False },
@@ -81,6 +81,7 @@ class Drivetrain(commands2.SubsystemBase):
         self.setFieldDriveRelative(True)
         self.ang = 0
         self.iteration = 0
+        
 
     def getHeading(self) -> Rotation2d:
         return Rotation2d.fromDegrees(self.imu.getFusedHeading() - self.headingOffset)
@@ -195,3 +196,8 @@ class Drivetrain(commands2.SubsystemBase):
     def calWheels(self, enable):
         for m in self.swerveModules:
             m.setCal(enable)
+
+    """Future improvment"""
+    #def periodic(self):
+    #    for m in self.swerveModules:
+    #        m.periodic()
