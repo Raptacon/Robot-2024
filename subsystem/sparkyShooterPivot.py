@@ -28,6 +28,8 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.zeroed = False
         self.zeroing = False
 
+        self.manualControl = False
+
     def runPivot(self, speed : float):
         self.pivotMotor.set(speed)
         wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
@@ -40,7 +42,10 @@ class ShooterPivot(commands2.PIDSubsystem):
         return
 
     def useOutput(self, output: float, setpoint: float):
-
+        if(self.manualControl): 
+            self.controlManually()
+            return
+        
         zeroing = self.zeroing
         #Do not use output until zeroed
         if not self.zeroed:
@@ -92,3 +97,14 @@ class ShooterPivot(commands2.PIDSubsystem):
     #sets amp angle
     def setAmp(self):
         self.setSetpoint(0.4)
+
+    def setClimb(self):
+        self.setSetpoint(0.1)
+
+    def controlManually(self):
+        self.manualControl = True
+        self.pivotMotor.set(0.2 * self.manualDirection)
+
+    def checkManualControl(self, control : bool, direction : float):
+        self.manualControl = control
+        self.manualDirection = direction
