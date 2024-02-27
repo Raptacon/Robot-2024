@@ -15,6 +15,12 @@ According to [Robotpy](https://robotpy.readthedocs.io/en/stable/faq.html#what-ve
 
 There is a general setup that is needed for each OS before you can build the code. Please look at the ![FRC Zero to Robot](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html) to get the initial setup for NI and then ![WPILib](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html) which has an amazing need to mount an ISO this year so make sure to pay attention to the "Mount" instructions. Once you have those completed in theory you can clone our code and type make. Make sure to see the OS specific instructions below.
 
+## Pyenv
+
+You almost certainly want to install pyenv to manage your various python versions. You still want to use venv but pyenv manages your overall python
+
+There is a good tutorial (here)[https://realpython.com/intro-to-pyenv/]
+
 ## OSX Users
 
 If you're using OSX you probably want to install python from python.org. Brew python has problems with Tk (simulator) where the widgets won't render correctly.
