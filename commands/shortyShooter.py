@@ -43,9 +43,14 @@ class ShooterCommand(commands2.CommandBase):
 
         self.shooter.runShooters(self.shooterSpeed())
 
-        self.pivot.checkManualControl(self.manualControl(), self.manualInput())
+        if(self.manualControl()):
+            self.pivot.disable()
+            self.pivot.runPivot(0.2 * round(self.manualInput()))
+        elif(self.manualControl() and not self.pivot.isEnabled):
+            self.pivot.runPivot(0)
 
         if(self.pivotToggle()):
+            self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False
                 self.pivot.setAmp()
@@ -54,5 +59,5 @@ class ShooterCommand(commands2.CommandBase):
                 self.pivot.setLoading()
 
         if(self.climbPos()):
+            self.pivot.enable()
             self.pivot.setClimb()
-

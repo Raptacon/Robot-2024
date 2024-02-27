@@ -84,9 +84,9 @@ class RobotSwerve:
             lambda: self.mechController.getBButton(),
             lambda: self.mechController.getRightTriggerAxis(),
             self.mechController.getYButtonPressed,
+            self.mechController.getXButtonPressed,
             self.mechController.getLeftBumper,
-            self.mechController.getLeftY,
-            self.mechController.getXButtonPressed
+            self.mechController.getLeftY
         ))
 
         CameraServer.launch()
