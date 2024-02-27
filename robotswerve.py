@@ -45,6 +45,8 @@ class RobotSwerve:
 
         self.driveTrain = Drivetrain()
 
+        self.driverStation = wpilib.DriverStation
+
         self.intake = SparkyIntake()
         self.pivot = IntakePivot()
         self.intakePivotController = pivotController()
@@ -90,10 +92,7 @@ class RobotSwerve:
         CameraServer.launch()
 
         if True:
-            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain)
-
-        if True:
-            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain)
+            self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.driverStation)
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(

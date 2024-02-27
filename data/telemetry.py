@@ -43,17 +43,25 @@ for i in range(len(Drivetrain.kModuleProps)):
         [f"currSteerDegree{i + 1}", FloatLogEntry, f"module{i + 1}/currsteerdegree"]
     ])
 
+driverStationEntries = [
+    ["alliance", StringLogEntry, "alliance"],
+    ["autonomous", BooleanLogEntry, "autonomous"]
+
+]
+
 class Telemetry():    
     def __init__(self, 
                  driverController: wpilib.XboxController = None, 
                  mechController: wpilib.XboxController = None,
-                 driveTrain: Drivetrain = None
+                 driveTrain: Drivetrain = None,
+                 driverStation: wpilib.DriverStation = None
 
                  ):
         self.driverController = driverController
         self.mechController = mechController
         self.odometryPosition = driveTrain.odometry
         self.swerveModules = driveTrain.swerveModules
+        self.driverStation = driverStation
 
         self.datalog = DataLog("data/log")
         for entryname, entrytype, logname in telemetryButtonEntries:
@@ -63,9 +71,14 @@ class Telemetry():
             setattr(self, entryname, entrytype(self.datalog, "odometry/" + logname))
         for entryname, entrytype, logname in telemetrySwerveDriveTrainEntries:
             setattr(self, entryname, entrytype(self.datalog, "swervedrivetrain/" + logname))
+        for entryname, entrytype, logname in driverStationEntries:
+            setattr(self, entryname, entrytype(self.datalog, "driverstation/" + logname))
 
 
     def getDriverControllerInputs(self):
+        """
+        Records data for buttons and axis inputs for the first controller
+        """
         self.driverAButton.append(self.driverController.getAButton()) #bool
         self.driverBButton.append(self.driverController.getBButton()) #bool
         self.driverXButton.append(self.driverController.getXButton()) #bool
@@ -85,6 +98,9 @@ class Telemetry():
         self.driverDPad.append(self.driverController.getPOV()) #ints
 
     def getMechControllerInputs(self):
+        """
+        Records data for buttons and axis inputs for the second controller
+        """
         self.mechAButton.append(self.mechController.getAButton()) #bool
         self.mechBButton.append(self.mechController.getBButton()) #bool
         self.mechXButton.append(self.mechController.getXButton()) #bool
@@ -104,18 +120,40 @@ class Telemetry():
         self.mechDPad.append(self.mechController.getPOV()) #ints
 
     def getOdometryInputs(self):
+        """
+        Records the data for the positions of the bot in a field, 
+        Gives the x position, y position and rotation
+        """
         pose = self.odometryPosition.getPose()
         self.xPositions.append(pose.X())
         self.yPositions.append(pose.Y())
         self.angles.append(pose.rotation().degrees())
 
     def getSwerveInputs(self):
+        """
+        Gets the inputs for some swerve drive train inputs
+        it get the steer angle, the drive percent and the velocity
+        """
         for i, swerveModule in enumerate(self.swerveModules):
             getattr(self, f"steerDegree{i + 1}").append(swerveModule.steerAngle)
             getattr(self, f"drivePercent{i + 1}").append(swerveModule.drivePercent)
             getattr(self, f"moduleVelocity{i + 1}").append(swerveModule.getDriveVelocity())
             getattr(self, f"currSteerDegree{i + 1}").append(math.degrees(swerveModule.getSteerAngle()))
-    
+
+    def getDriverStationInputs(self):
+        """
+        Gets the inputs of some match/general robot things, 
+        the things being: Alliance color and what mode it is in and 
+        if it is enabled
+        """
+        alliance = "No Alliance"
+        if self.driverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
+            alliance = "Blue"
+        if self.driverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+            alliance = "Red"
+        self.alliance.append(alliance)
+        self.autonomous.append(self.driverStation.isAutonomous())
+
     def runDataCollections(self):
         if self.driverController is not None:
             self.getDriverControllerInputs()
@@ -125,3 +163,5 @@ class Telemetry():
             self.getOdometryInputs()
         if self.swerveModules is not None:
             self.getSwerveInputs()
+        if self.driverStation is not None:
+            self.getDriverStationInputs()
