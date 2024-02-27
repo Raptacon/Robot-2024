@@ -78,6 +78,8 @@ class Drivetrain(commands2.SubsystemBase):
         self.headingOffset = 0
         self.odometry = wpimath.kinematics.SwerveDrive4Odometry(self.kinematics, self.getHeading(), self.moduleRotations)
         self.pos = Pose2d()
+        self.posX = 0
+        self.posY = 0
         self.setFieldDriveRelative(True)
         self.ang = 0
         self.iteration = 0
@@ -145,11 +147,13 @@ class Drivetrain(commands2.SubsystemBase):
                             self.swerveModules[0].getPosition(),
                             self.swerveModules[2].getPosition()])
          
+        self.posX = self.pos.Y()
+        self.posY = self.pos.X()
+
         if self.posTable:
             self.posTable.putNumber("Robot_PosX", self.pos.Y())
             self.posTable.putNumber("Robot_PosY", self.pos.X())
-            self.posTable.putNumber("odom angle", self.pos.rotation().degrees())
-            self.posTable.putNumber("actual angle", self.getHeading().degrees())
+            self.posTable.putNumber("Robot_Angle", self.pos.rotation().degrees())
         else:
             self.posTable = self.datatable.getTable("Robot position")
 

@@ -25,7 +25,7 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
-from auto import Autonomous
+from auto import SparkyShoot
 
 import math
 
@@ -71,6 +71,7 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
+        
         self.intake.setDefaultCommand(Intake(
             self.intake,
             self.intakePivotController,
@@ -124,7 +125,7 @@ class RobotSwerve:
             self.autonomousCommand.schedule()
 
     def getAutonomousCommand(self):
-        return Autonomous(self.driveTrain)
+        return SparkyShoot(self.shooter, self.intake, self.driveTrain)
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""

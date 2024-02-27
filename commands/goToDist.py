@@ -33,11 +33,11 @@ class GoToDist(commands2.CommandBase):
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
         if(not self.drive.getPos()): return
-        self.distX = self.drive.getPos().X() - self.startingXDistance
-        self.distY = self.drive.getPos().Y() - self.startingYDistance
+        self.distX = self.drive.posX - self.startingXDistance
+        self.distY = self.drive.posY - self.startingYDistance
 
-        self.totalOffsetY = self.targetPos.Y() - self.drive.getPos().Y()
-        self.totalOffsetX = self.targetPos.X() - self.drive.getPos().X()
+        self.totalOffsetY = self.targetPos.Y() - self.distY
+        self.totalOffsetX = self.targetPos.X() - self.distX
 
         self.drive.updateOdometry()
 
@@ -46,7 +46,7 @@ class GoToDist(commands2.CommandBase):
 
         print(f"pos : {self.drive.getPos().Y()} offset : {self.totalOffsetY}")
 
-        self.drive.drive(0, 0, 0 ,True)
+        #self.drive.drive(0, 0, 0 ,True)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""
