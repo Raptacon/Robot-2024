@@ -19,10 +19,10 @@ class Autonomous(commands2.SequentialCommandGroup):
         )
 
 class SparkyShoot(commands2.SequentialCommandGroup):
-    def __init__(self, shooter : Shooter, intake : SparkyIntake, drive : Drivetrain) -> None:
+    def __init__(self, shooter : Shooter, intake : SparkyIntake) -> None:
         super().__init__()
         self.addCommands(
             commands2.PrintCommand("Running Shooter"),
-            HandOff(shooter, intake, 3, 1),
+            HandOff(shooter, intake, 2, 0.4),
             commands2.PrintCommand("Finished Shooter"),
         )

@@ -64,31 +64,6 @@ class RobotSwerve:
 
         commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
-        self.driveTrain.setDefaultCommand(DefaultDrive(
-            self.driveTrain,
-            lambda: wpimath.applyDeadband(self.driveController.getLeftX(), 0.06),
-            lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
-            lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
-            lambda: self.driveTrain.getFieldDriveRelative()
-        ))
-        
-        self.intake.setDefaultCommand(Intake(
-            self.intake,
-            self.intakePivotController,
-            lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getAButtonPressed(),
-        ))
-
-        self.shooter.setDefaultCommand(ShooterCommand(
-            self.shooter,
-            self.shooterPivot,
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getBButton(),
-            lambda: self.mechController.getRightTriggerAxis(),
-            self.mechController.getYButtonPressed
-            ))
-
         CameraServer.launch()
 
         '''
@@ -125,7 +100,7 @@ class RobotSwerve:
             self.autonomousCommand.schedule()
 
     def getAutonomousCommand(self):
-        return SparkyShoot(self.shooter, self.intake, self.driveTrain)
+        return SparkyShoot(self.shooter, self.intake)
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
@@ -140,6 +115,23 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
+        ))
+        
+        self.intake.setDefaultCommand(Intake(
+            self.intake,
+            self.intakePivotController,
+            lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
+            lambda: self.mechController.getRightBumper(),
+            lambda: self.mechController.getAButtonPressed(),
+        ))
+
+        self.shooter.setDefaultCommand(ShooterCommand(
+            self.shooter,
+            self.shooterPivot,
+            lambda: self.mechController.getRightBumper(),
+            lambda: self.mechController.getBButton(),
+            lambda: self.mechController.getRightTriggerAxis(),
+            self.mechController.getYButtonPressed
         ))
 
     def teleopPeriodic(self) -> None:
