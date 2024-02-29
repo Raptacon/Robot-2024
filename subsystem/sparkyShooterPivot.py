@@ -39,15 +39,6 @@ class ShooterPivot(commands2.PIDSubsystem):
         return
 
     def useOutput(self, output: float, setpoint: float):
-        """
-        if(self.manualControl): 
-            self.controlManually()
-            return
-        
-        if(self.maintainPosition):
-            return
-        """
-        
         zeroing = self.zeroing
         #Do not use output until zeroed
         if not self.zeroed:
