@@ -97,8 +97,6 @@ class Drivetrain(commands2.SubsystemBase):
         #actually don't
         rot = rot# * 180.0
         #print(f"drive: x {xSpeed}, y {ySpeed}, rot {rot}, field {fieldRelative}")
-        #xSpeed = 0.0
-        #ySpeed = 0.0
         #rot = self.ang
         #rot = rot * 360
         #self.ang += 1.0
