@@ -36,7 +36,9 @@ class Strip():
             case Mode.RAINBOWBRIGHT:
                 self.hsv[2] = rainbowValue(self.strip, self.hsv[0], self.hsv[1], self.hsv[2], self.fadeRate)
             case Mode.BLINK |  Mode.FLASH | Mode.STATIC:
-                blink(self.strip, self.timer, self.rateS, self.dutyCycle, self.rgbPrimary, self.rgbPrimary)
+                blink(self.strip, self.timer, self.rateS, self.dutyCycle, self.rgbPrimary, self.rgbSecondary)
+            case Mode.RANDOM:
+                randomLeds(self.strip, self.timer, self.rateS)
 
 
     def getDefaultHue(self):
@@ -83,7 +85,7 @@ class Strip():
     def setRandom(self, rateS: float):
         self.dutyCycle = 1.0
         self.rateS = rateS
-        self.mode.Mode.RANDOM
+        self.mode = Mode.RANDOM
     def setTeamColor(self, chase = True):
         if chase:
             self.setRainbowValue(self.getDefaultHue(), 255, 128)
@@ -105,7 +107,9 @@ class Leds(commands2.Subsystem):
         #Left 2nd set of 9 reverse order
         self.strips["left"] =  Strip(self.ledData[9:18][::-1])
         self.strips["right"].setTeamColor()
+        self.strips["right"].setBlink([180,55,0], 2.0, .3)
         self.strips["left"].setTeamColor()
+        self.strips["left"].setRandom(.5)
 
         #Confiugure the LED strip
         self.leds.setLength(self.kLEDBuffer)
