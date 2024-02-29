@@ -19,7 +19,7 @@ from commands.shortyShooter import ShooterCommand
 from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyShooterPivot import ShooterPivot
 
-from subsystem.sparyLeds import Leds
+from subsystem.sparkyLeds import Leds
 
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
