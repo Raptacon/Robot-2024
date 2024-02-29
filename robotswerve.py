@@ -46,6 +46,7 @@ class RobotSwerve:
 
         self.driveTrain = Drivetrain()
 
+        # Provide access to the network communication data to / from the Driver Station.
         self.driverStation = wpilib.DriverStation
 
         self.intake = SparkyIntake()
