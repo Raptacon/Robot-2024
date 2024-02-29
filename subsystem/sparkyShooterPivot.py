@@ -90,7 +90,6 @@ class ShooterPivot(commands2.PIDSubsystem):
             return False
         else:
             self.pivotMotor.set(0.0)
-            wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
             return True
 
     #sets loading angle
