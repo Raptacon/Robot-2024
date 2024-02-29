@@ -71,8 +71,10 @@ class RobotSwerve:
 
         # TODO - Default this to True once we like what we see with telemetry
         # By default, disable telemetry unless explicitly enabled by the drive station
-        enableTelemetry = wpilib.SmartDashboard.getBoolean("enableTelemetry", False)
-        if enableTelemetry:
+        self.enableTelemetry = wpilib.SmartDashboard.getBoolean(
+            "enableTelemetry", False
+        )
+        if self.enableTelemetry:
             self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.driverStation)
 
         '''
@@ -94,9 +96,9 @@ class RobotSwerve:
             "Deploy User", self.getDeployInfo("deploy-user")
         )
     def robotPeriodic(self) -> None:
-        if self.telemetry:
+        if self.enableTelemetry and self.telemetry:
             self.telemetry.runDataCollections()
-        
+
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
         pass
