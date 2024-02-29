@@ -11,10 +11,10 @@ class Mode(Enum):
     RANDOM = 5
 
 class Strip():
-    def __init__(self, strip: list[wpilib.AddressableLED.LEDData], 
-                 mode: Mode = Mode.RAINBOWBRIGHT, 
-                 hsv: list[int, int, int] = [243, 255, 128], 
-                 rgbP: list[int, int, int] = [0, 255, 0], 
+    def __init__(self, strip: list[wpilib.AddressableLED.LEDData],
+                 mode: Mode = Mode.RAINBOWBRIGHT,
+                 hsv: list[int, int, int] = [243, 255, 128],
+                 rgbP: list[int, int, int] = [0, 255, 0],
                  rgbS: list[int,int,int] = [255,255,255]):
         self.strip = strip
         self.hsv = hsv
@@ -51,7 +51,7 @@ class Strip():
             return [0, 0, 255]
         else:
             return [255, 0, 0]
-        
+
     def setRainbowHue(self, startingHue: float = 0, saturation: float = 255, value: float = 128):
         self.hue = startingHue
         self.saturation = saturation
@@ -142,7 +142,7 @@ def blink(leds: list[wpilib.AddressableLED.LEDData], timer: wpilib.Timer, rateS:
     rgb = offRgb
     if timer.get() < rateS * dutyCycle:
         rgb = onRgb
-    
+
     for led in leds:
         led.setRGB(*rgb)
 
