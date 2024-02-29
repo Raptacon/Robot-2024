@@ -53,13 +53,13 @@ driverStationEntries = [
 
 class Telemetry:
 
-    def __init__(self, 
-                 driverController: wpilib.XboxController = None, 
-                 mechController: wpilib.XboxController = None,
-                 driveTrain: Drivetrain = None,
-                 driverStation: wpilib.DriverStation = None
-
-                 ):
+    def __init__(
+        self,
+        driverController: wpilib.XboxController = None,
+        mechController: wpilib.XboxController = None,
+        driveTrain: Drivetrain = None,
+        driverStation: wpilib.DriverStation = None,
+    ):
         self.driverController = driverController
         self.mechController = mechController
         self.odometryPosition = driveTrain.odometry
