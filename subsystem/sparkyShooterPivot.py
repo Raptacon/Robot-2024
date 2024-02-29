@@ -16,6 +16,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.pivotMotor.setInverted(False)
         self.encoder = self.pivotMotor.getEncoder()
         #scaled to 0..1 = forward - end limit
+        #80:1 use 1/73.38 100:1 use 88.056
         self.encoder.setPositionConversionFactor(1/88.056)
 
         #get limits
