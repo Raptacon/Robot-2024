@@ -146,13 +146,6 @@ class RobotSwerve:
                  "Shooter Cal",
                  "Shoot Piviot Zero",
                  "Shoot Piviot Reverse",
-                 "Shoot Piviot Pos",
-                 "Led Random",
-                 "Right Solid",
-                 "Left Flash",
-                 "Right Rainbow",
-                 "Led Team",
-                 "None"]
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
