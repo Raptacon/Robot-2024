@@ -86,7 +86,6 @@ class ShooterPivot(commands2.PIDSubsystem):
         wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
         
         if not self.reverseLimit.get():
-            #print(f"moving {self.getPosition()}")
             self.pivotMotor.set(-speed)
             wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
             return False
