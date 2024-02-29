@@ -94,7 +94,10 @@ class RobotSwerve:
 
         CameraServer.launch()
 
-        if True:
+        # TODO - Default this to True once we like what we see with telemetry
+        # By default, disable telemetry unless explicitly enabled by the drive station
+        enableTelemetry = wpilib.SmartDashboard.getBoolean("enableTelemetry", False)
+        if enableTelemetry:
             self.telemetry = Telemetry(self.driveController, self.mechController, self.driveTrain, self.driverStation)
 
         '''
