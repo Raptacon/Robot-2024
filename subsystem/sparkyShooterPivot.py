@@ -89,7 +89,6 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.set(-speed)
             return False
         else:
-            #print(f"Done {self.getPosition()}")
             self.pivotMotor.set(0.0)
             wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
             return True
