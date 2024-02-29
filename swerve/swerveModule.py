@@ -127,7 +127,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
         and the encoders rotated by encoderCal.
         location [x (trackbase + is left side), y (wheelbase + is front), name]
         '''
-        self.consts = SwerveModuleMK4I_L2Consts()
+        self.consts = SwerveModuleMk4L1Consts()
         self.driveId = channelBase + 0
         self.steerId = channelBase + 1
         self.cancoderId = channelBase + 2
@@ -169,10 +169,14 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
         if status != phoenix5.ErrorCode.OK:
             raise RuntimeError(f"Failed to configure Drive Motor on id {self.driveId}. Error {status}")
         self.driveMotor.enableVoltageCompensation(12.0)
+        self.driveMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+        self.driveEncoder = self.driveMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor)
+        self.driveEncoder.setPosition(0)
+        self.driveEncoder.setPositionConversionFactor(self.driveSensorPositionCoefficient)
+        self.driveEncoder.setVelocityConversionFactor(self.driveSensorVelocityCoefficient)
         # self.driveMotor.setSensorPhase(True)
 
         status = phoenix5.ErrorCode.OK # self.driveMotor.setStatusFramePeriod(ctre.StatusFrameEnhanced.Status_1_General, self.kCanStatusFrameMs, 250)
@@ -248,9 +252,14 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
     def getDriveVelocity(self):
         '''gets module drive voltage (speed)'''
         return self.driveEncoder.getVelocity() * self.driveSensorVelocityCoefficient
+    
     def getSteerAngle(self):
         '''gets current angle in radians of module setpoint'''
         return math.radians(self.encoder.getAbsolutePosition())
+    
+    def getDrivePosition(self):
+        return self.driveEncoder.getPosition()
+    
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
 
@@ -328,18 +337,25 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
         return self.steerController
     def getTranslation(self) -> wpimath.geometry.Translation2d:
         return self.translation
+    
+    def resetDistance(self):
+        self.driveEncoder.setPosition(0)
 
-    def getPosition(self):
-        vel = self.getDriveVelocity()
-
-        # calculate total distance traveled
-        self.distTraveled += vel * .02
+    def getPosition(self) -> wpimath.kinematics.SwerveModulePosition:
+        self.distTraveled = self.getDrivePosition()
         ang = self.getSteerAngle()
         if self.table:
             self.table.putNumber("curr steer deg", math.degrees(ang))
-            self.table.putNumber("curr vel", vel)
-        return wpimath.kinematics.SwerveModulePosition(self.distTraveled, wpimath.geometry.Rotation2d(math.degrees(ang)))
-
+            self.table.putNumber("cur distance meters", self.distTraveled)
+        return wpimath.kinematics.SwerveModulePosition(self.distTraveled, wpimath.geometry.Rotation2d(ang))
+    
+    def getVelocity(self) -> wpimath.kinematics.SwerveModuleState:
+        self.velocity = self.getDriveVelocity()
+        ang = self.getSteerAngle()
+        if(self.table):
+            self.table.putNumber("curr velocity", self.velocity)
+        return wpimath.kinematics.SwerveModuleState(self.velocity, wpimath.geometry.Rotation2d(ang))
+    
     def disable(self, drive = True, steer = True):
         if drive:
             self.driveMotor.disable()
