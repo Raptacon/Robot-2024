@@ -107,9 +107,7 @@ class Leds(commands2.Subsystem):
         #Left 2nd set of 9 reverse order
         self.strips["left"] =  Strip(self.ledData[9:18][::-1])
         self.strips["right"].setTeamColor()
-        self.strips["right"].setBlink([180,55,0], 2.0, .3)
         self.strips["left"].setTeamColor()
-        self.strips["left"].setRandom(.5)
 
         #Confiugure the LED strip
         self.leds.setLength(self.kLEDBuffer)
