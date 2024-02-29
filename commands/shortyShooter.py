@@ -10,7 +10,10 @@ class ShooterCommand(commands2.CommandBase):
                  intaking : typing.Callable[[], bool],
                  outaking : typing.Callable[[], bool],
                  shooterSpeed : typing.Callable[[], float],
-                 pivotToggle: typing.Callable[[], bool]):
+                 pivotToggle: typing.Callable[[], bool],
+                 climbPos : typing.Callable[[], bool],
+                 manualControl : typing.Callable[[], bool],
+                 manualInput : typing.Callable[[], float]):
         super().__init__()
 
         self.shooter = shooter
@@ -22,6 +25,11 @@ class ShooterCommand(commands2.CommandBase):
         self.pivot = pivot
         self.pivotLoad = True
         self.pivot.enable()
+
+        self.climbPos = climbPos
+
+        self.manualControl = manualControl
+        self.manualInput = manualInput
 
         self.addRequirements(self.shooter, self.pivot)
 
@@ -35,10 +43,21 @@ class ShooterCommand(commands2.CommandBase):
 
         self.shooter.runShooters(self.shooterSpeed())
 
+        if(self.manualControl()):
+            self.pivot.disable()
+            self.pivot.runPivot(0.2 * round(self.manualInput()))
+        elif(self.manualControl() and not self.pivot.isEnabled):
+            self.pivot.runPivot(0)
+
         if(self.pivotToggle()):
+            self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False
                 self.pivot.setAmp()
             else:
                 self.pivotLoad = True
                 self.pivot.setLoading()
+
+        if(self.climbPos()):
+            self.pivot.enable()
+            self.pivot.setClimb()

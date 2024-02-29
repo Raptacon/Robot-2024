@@ -16,7 +16,8 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.pivotMotor.setInverted(False)
         self.encoder = self.pivotMotor.getEncoder()
         #scaled to 0..1 = forward - end limit
-        self.encoder.setPositionConversionFactor(1/73.38)
+        #80:1 use 1/73.38 100:1 use 88.056
+        self.encoder.setPositionConversionFactor(1/88.056)
 
         #get limits
         self.forwardLimit = self.pivotMotor.getForwardLimitSwitch(rev.SparkMaxLimitSwitch.Type.kNormallyClosed)
@@ -30,8 +31,6 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     def runPivot(self, speed : float):
         self.pivotMotor.set(speed)
-        wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
-
 
     def getMeasurement(self):
         return -self.encoder.getPosition()
@@ -40,7 +39,6 @@ class ShooterPivot(commands2.PIDSubsystem):
         return
 
     def useOutput(self, output: float, setpoint: float):
-
         zeroing = self.zeroing
         #Do not use output until zeroed
         if not self.zeroed:
@@ -60,7 +58,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.voltage = max(-10, min(self.voltage, 10))
         #print(f"using output {output} {setpoint} {self.voltage}")
         self.pivotMotor.setVoltage(-self.voltage)
-
+        wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
 
     def zeroPivot(self, speed : float = 0.2):
         self.zeroing = True
@@ -76,19 +74,25 @@ class ShooterPivot(commands2.PIDSubsystem):
             return True
 
     def maxPivot(self, speed : float = 0.2):
+        wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
+        
         if not self.reverseLimit.get():
-            print(f"moving {self.getPosition()}")
             self.pivotMotor.set(-speed)
             return False
         else:
-            print(f"Done {self.getPosition()}")
             self.pivotMotor.set(0.0)
             return True
 
     #sets loading angle
     def setLoading(self):
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
     def setAmp(self):
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
+
+    def setClimb(self):
+        self.pivotMotor.setSmartCurrentLimit(60)
+        self.setSetpoint(0.05)
