@@ -146,7 +146,13 @@ class RobotSwerve:
                  "Shooter Cal",
                  "Shoot Piviot Zero",
                  "Shoot Piviot Reverse",
-                 "Shoot Piviot Pos"]
+                 "Shoot Piviot Pos",
+                 "Led Random",
+                 "Right Solid",
+                 "Left Flash",
+                 "Right Rainbow",
+                 "Led Team",
+                 "None"]
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
@@ -218,6 +224,23 @@ class RobotSwerve:
                 self.shooterPivot.setSetpoint(pivotAngle)
                 self.shooterPivot.periodic()
                 pass
+            case "Led Random":
+                self.leds.getStrip("left").setRandom(1.0)
+                self.leds.getStrip("right").setRandom(5.0)
+                #wpilib.SmartDashboard.putData("Test Mode", "None")
+            case "Right Solid":
+                self.leds.getStrip("right").setStatic([128, 128, 0])
+                #wpilib.SmartDashboard.putData("Test Mode", "None")
+            case "Left Flash":
+                self.leds.getStrip("left").setFlash([0,255,0], [0,0,64], 0.2, .7)
+                #wpilib.SmartDashboard.putData("Test Mode", "None")
+            case "Right Rainbow":
+                self.leds.getStrip("right").setRainbowHue()
+                #wpilib.SmartDashboard.putData("Test Mode", "None")
+            case "Led Team":
+                self.leds.getStrip("left").setTeamColor(False)
+                self.leds.getStrip("right").setTeamColor()
+                #wpilib.SmartDashboard.putData("Test Mode", "None")
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
