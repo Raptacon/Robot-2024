@@ -183,7 +183,6 @@ class RobotSwerve:
                 self.calDis = False
                 self.driveTrain.disable()
             case "Wheels Select":
-                #self.driveTrain.setSteer(wheelAngle)
                 self.driveTrain.setSteer(wheelAngle)
             case "Wheels Drive":
                 self.driveTrain.setDrive(wheelSpeed)
