@@ -27,7 +27,6 @@ from commands.resetfielddrive import ResetFieldDrive
 
 from auto import SparkyShoot
 
-import math
 
 from wpilib import CameraServer
 kDriveControllerIdx = 0
@@ -174,9 +173,6 @@ class RobotSwerve:
         wheelAngle #"use" value
         wheelSpeed #"use" value
         self.driveTrain.getCurrentAngles()
-        #LeftX = wpimath.applyDeadband(self.driveController.getLeftX(), 0.02)
-        #LeftY = wpimath.applyDeadband(self.driveController.getLeftY(), 0.02)
-        #RightY = wpimath.applyDeadband(self.driveController.getRightY(), 0.1)
         global lastDeg
 
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)

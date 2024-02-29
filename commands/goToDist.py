@@ -4,7 +4,6 @@ import wpimath.controller
 from subsystem.swerveDriveTrain import Drivetrain
 from wpimath.geometry import Pose2d, Transform2d
 import wpimath.units
-import math
 
 class GoToDist(commands2.CommandBase):
     targetPos = Pose2d()
