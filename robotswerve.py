@@ -27,7 +27,6 @@ from commands.resetfielddrive import ResetFieldDrive
 
 from auto import SparkyShoot
 
-import math
 
 from wpilib import CameraServer
 kDriveControllerIdx = 0
