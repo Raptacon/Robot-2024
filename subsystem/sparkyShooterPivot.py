@@ -31,7 +31,6 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     def runPivot(self, speed : float):
         self.pivotMotor.set(speed)
-        #wpilib.SmartDashboard.putNumber("Shooter pos", self.encoder.getPosition())
 
     def getMeasurement(self):
         return -self.encoder.getPosition()
