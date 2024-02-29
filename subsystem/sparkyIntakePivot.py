@@ -11,7 +11,7 @@ class IntakePivot(commands2.PIDSubsystem):
     kRolloverDeadZoneDeg = 340
     def __init__(self) -> None:
         self.pivotMotor = rev.CANSparkMax(22, rev.CANSparkLowLevel.MotorType.kBrushless)
-        self.pivotMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
+        self.pivotMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
         self.pivotMotor.setInverted(False)
 
         self.pivotRelEncoder = self.pivotMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor)
