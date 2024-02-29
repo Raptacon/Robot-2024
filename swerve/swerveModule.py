@@ -127,7 +127,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder() :
         and the encoders rotated by encoderCal.
         location [x (trackbase + is left side), y (wheelbase + is front), name]
         '''
-        self.consts = SwerveModuleMk4L1Consts()
+        self.consts = SwerveModuleMK4I_L2Consts()
         self.driveId = channelBase + 0
         self.steerId = channelBase + 1
         self.cancoderId = channelBase + 2

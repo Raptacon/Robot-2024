@@ -115,7 +115,6 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
-        
         self.intake.setDefaultCommand(Intake(
             self.intake,
             self.intakePivotController,
@@ -130,7 +129,10 @@ class RobotSwerve:
             lambda: self.mechController.getRightBumper(),
             lambda: self.mechController.getBButton(),
             lambda: self.mechController.getRightTriggerAxis(),
-            self.mechController.getYButtonPressed
+            self.mechController.getYButtonPressed,
+            self.mechController.getXButtonPressed,
+            self.mechController.getLeftBumper,
+            self.mechController.getLeftY
         ))
 
     def teleopPeriodic(self) -> None:

@@ -85,11 +85,14 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     #sets loading angle
     def setLoading(self):
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
     def setAmp(self):
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
+        self.pivotMotor.setSmartCurrentLimit(60)
         self.setSetpoint(0.05)
