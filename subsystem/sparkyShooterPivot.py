@@ -74,6 +74,8 @@ class ShooterPivot(commands2.PIDSubsystem):
     def zeroPivot(self, speed : float = 0.2):
         self.zeroing = True
         if not self.forwardLimit.get():
+            #disable limit to allow zeroing
+            self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, False)
             self.zeroed = False
             self.pivotMotor.set(speed)
             return False
