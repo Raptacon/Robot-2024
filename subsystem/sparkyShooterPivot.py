@@ -107,7 +107,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        self.pivotMotor.setSmartCurrentLimit(20)
+        #self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
@@ -118,7 +118,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        self.pivotMotor.setSmartCurrentLimit(20)
+        #self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
@@ -129,7 +129,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            self.pivotMotor.setSmartCurrentLimit(60)
+            #self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
