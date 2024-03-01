@@ -82,6 +82,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.zeroed = True
             self.pivotMotor.set(0.0)
             self.encoder.setPosition(0)
+            #once zeroed, set softlimit to allow a soft "landing"
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.01)
             self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, True)
             return True
