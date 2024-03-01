@@ -30,6 +30,9 @@ class ShooterCommand(commands2.CommandBase):
 
         self.manualControl = manualControl
         self.manualInput = manualInput
+        self.manualPivot = False
+
+        self.climbing = False
 
         self.addRequirements(self.shooter, self.pivot)
 
@@ -41,13 +44,19 @@ class ShooterCommand(commands2.CommandBase):
         else:
             self.shooter.runIntake(0)
 
-        self.shooter.runShooters(self.shooterSpeed())
+        voltage = 0
+        # set full speed if enabling shooter
+        if self.shooterSpeed() > 0.2:
+            voltage = 12.0
+        self.shooter.runShooters(voltage)
 
         if(self.manualControl()):
+            self.manualPivot = True
             self.pivot.disable()
-            self.pivot.runPivot(0.2 * round(self.manualInput()))
-        elif(self.manualControl() and not self.pivot.isEnabled):
+            self.pivot.runPivot(self.manualInput())
+        elif(self.manualControl() and self.manualPivot):
             self.pivot.runPivot(0)
+            self.manualPivot = False
 
         if(self.pivotToggle()):
             self.pivot.enable()
@@ -59,5 +68,10 @@ class ShooterCommand(commands2.CommandBase):
                 self.pivot.setLoading()
 
         if(self.climbPos()):
+            self.climbing = True
             self.pivot.enable()
             self.pivot.setClimb()
+        elif self.climbing:
+            #disable on button release
+            self.climbing = False
+            self.pivot.pivotMotor.set(0)
