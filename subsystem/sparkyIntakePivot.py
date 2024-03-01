@@ -29,9 +29,6 @@ class IntakePivot(commands2.PIDSubsystem):
 
         self.setSetpoint(self.getPostion())
 
-    def periodic(self):
-        super().periodic()
-
     def useOutput(self, output: float, setpoint: float):
         feedforward = self.motorFeedforward.calculate(setpoint, 0)
         wpilib.SmartDashboard.putNumber("Pivot Current", self.pivotMotor.getOutputCurrent())
