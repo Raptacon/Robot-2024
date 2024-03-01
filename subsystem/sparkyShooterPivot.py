@@ -22,6 +22,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.encoder.setPositionConversionFactor(1/88.056)
         self.encoder.setPosition(0)
         
+        # Enable softlimit for negative direction. Note that all postions go from 0..~ -1
         self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, True)
         self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, -1.0)
 
