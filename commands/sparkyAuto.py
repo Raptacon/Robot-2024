@@ -16,7 +16,7 @@ class HandOff(commands2.CommandBase):
 
     def execute(self) -> None:
         self.currentTime = time.time() - self.startingTime
-        self.shooter.runShooters(1)
+        self.shooter.runShooters(14)
         if(self.currentTime >= self.shooterWait):
             self.intake.runIntake(-0.4)
             self.shooter.runIntake(0.4)
