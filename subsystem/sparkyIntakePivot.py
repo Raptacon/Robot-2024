@@ -31,10 +31,6 @@ class IntakePivot(commands2.PIDSubsystem):
 
     def periodic(self):
         super().periodic()
-        if(wpilib.DriverStation.isEnabled()):
-            self.pivotMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
-        else:
-            self.pivotMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
 
     def useOutput(self, output: float, setpoint: float):
         feedforward = self.motorFeedforward.calculate(setpoint, 0)
