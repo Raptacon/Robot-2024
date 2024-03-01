@@ -12,7 +12,7 @@ class ShooterCommand(commands2.CommandBase):
                  shooterSpeed : typing.Callable[[], float],
                  pivotToggle: typing.Callable[[], bool],
                  climbPos : typing.Callable[[], bool],
-                 manualControl : typing.Callable[[], bool],
+                 manualPivotControl : typing.Callable[[], bool],
                  manualInput : typing.Callable[[], float]):
         super().__init__()
 
@@ -28,7 +28,7 @@ class ShooterCommand(commands2.CommandBase):
 
         self.climbPos = climbPos
 
-        self.manualControl = manualControl
+        self.manualPivotControl = manualPivotControl
         self.manualInput = manualInput
         self.manualPivot = False
 
@@ -50,15 +50,29 @@ class ShooterCommand(commands2.CommandBase):
             voltage = 12.0
         self.shooter.runShooters(voltage)
 
-        if(self.manualControl()):
+        #priority
+        # Manual
+        # cancle manual
+        # climbing
+        # cancle climbing
+        # pos toggle
+        if(self.manualPivotControl()): #manual
             self.manualPivot = True
             self.pivot.disable()
             self.pivot.runPivot(self.manualInput())
-        elif(self.manualControl() and self.manualPivot):
+        elif self.manualPivot: #cancle Manual
             self.pivot.runPivot(0)
             self.manualPivot = False
-
-        if(self.pivotToggle()):
+        elif self.climbPos(): # climbing enabled
+            self.climbing = True
+            self.pivot.enable()
+            self.pivot.setClimb()
+        elif self.climbing: # climbing canceled
+            #disable on button release
+            self.climbing = False
+            self.pivot.pivotMotor.set(0)
+        elif self.pivotToggle(): #toggling piviot
+            #enable PID incase we disabled in another mode
             self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False
@@ -66,12 +80,3 @@ class ShooterCommand(commands2.CommandBase):
             else:
                 self.pivotLoad = True
                 self.pivot.setLoading()
-
-        if(self.climbPos()):
-            self.climbing = True
-            self.pivot.enable()
-            self.pivot.setClimb()
-        elif self.climbing:
-            #disable on button release
-            self.climbing = False
-            self.pivot.pivotMotor.set(0)

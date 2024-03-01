@@ -36,6 +36,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         #setup default values
         self.zeroed = False
         self.zeroing = False
+        self.coasting = False
 
     def runPivot(self, speed : float):
         self.pivotMotor.set(speed)
@@ -48,6 +49,13 @@ class ShooterPivot(commands2.PIDSubsystem):
     
     def periodic(self):
         super().periodic()
+        if wpilib.DriverStation.isEnabled() and self.coasting:
+            self.coasting = False
+            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kBrake)
+        elif not self.coasting:
+            self.coasting = True
+            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
+                
 
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
@@ -107,7 +115,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        #self.pivotMotor.setSmartCurrentLimit(60)
+        #self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
@@ -118,22 +126,20 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        #self.pivotMotor.setSmartCurrentLimit(60)
+        #self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
-        if self.encoder.getPosition() < 0.01 and not self.isEnabled():
-            self.pivotMotor.setVoltage(1.0)
+        if self.getMeasurement() < 0.008 and not self.isEnabled():
+            #TODO add function to turn off when close enough
+            print("limited")
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            #self.pivotMotor.setSmartCurrentLimit(70)
-            #self.pivotMotor.setSecondaryCurrentLimit(100, 30)
+            #self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
             #return
-
-        
-        self.pivotMotor.setVoltage(12.0)
+        self.runPivot(0.8)
