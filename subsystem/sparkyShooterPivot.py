@@ -54,7 +54,8 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kBrake)
         elif not self.coasting:
             self.coasting = True
-            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)    
+            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
+                
 
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
