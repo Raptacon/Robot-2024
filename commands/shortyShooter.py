@@ -12,7 +12,7 @@ class ShooterCommand(commands2.CommandBase):
                  shooterSpeed : typing.Callable[[], float],
                  pivotToggle: typing.Callable[[], bool],
                  climbPos : typing.Callable[[], bool],
-                 manualPiviotControl : typing.Callable[[], bool],
+                 manualPivotControl : typing.Callable[[], bool],
                  manualInput : typing.Callable[[], float]):
         super().__init__()
 
@@ -28,7 +28,7 @@ class ShooterCommand(commands2.CommandBase):
 
         self.climbPos = climbPos
 
-        self.manualPiviotControl = manualPiviotControl
+        self.manualPivotControl = manualPivotControl
         self.manualInput = manualInput
         self.manualPivot = False
 
@@ -56,7 +56,7 @@ class ShooterCommand(commands2.CommandBase):
         # climbing
         # cancle climbing
         # pos toggle
-        if(self.manualPiviotControl()): #manual
+        if(self.manualPivotControl()): #manual
             self.manualPivot = True
             self.pivot.disable()
             self.pivot.runPivot(self.manualInput())
