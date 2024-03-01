@@ -72,6 +72,7 @@ class ShooterCommand(commands2.CommandBase):
             self.climbing = False
             self.pivot.pivotMotor.set(0)
         elif self.pivotToggle(): #toggling piviot
+            #enable PID incase we disabled in another mode
             self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False
