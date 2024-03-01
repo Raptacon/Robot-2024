@@ -36,6 +36,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         #setup default values
         self.zeroed = False
         self.zeroing = False
+        self.coasting = False
 
     def runPivot(self, speed : float):
         self.pivotMotor.set(speed)
@@ -48,6 +49,12 @@ class ShooterPivot(commands2.PIDSubsystem):
     
     def periodic(self):
         super().periodic()
+        if wpilib.DriverStation.isEnabled() and self.coasting:
+            self.coasting = False
+            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kBrake)
+        elif not self.coasting:
+            self.coasting = True
+            self.pivotMotor.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)    
 
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
@@ -134,4 +141,4 @@ class ShooterPivot(commands2.PIDSubsystem):
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
             #return
-        self.runPivot(0.6)
+        self.runPivot(0.8)
