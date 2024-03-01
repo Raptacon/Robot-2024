@@ -123,13 +123,25 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
+<<<<<<< Updated upstream
         if self.encoder.getPosition() < 0.05 and not self.isEnabled():
+=======
+        if self.getMeasurement() < 0.008 and not self.isEnabled():
+            print("limited")
+>>>>>>> Stashed changes
             self.pivotMotor.setVoltage(1.0)
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
             self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
+<<<<<<< Updated upstream
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
         
         self.pivotMotor.setVoltage(10.0)
+=======
+            #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
+            #first round allow settings to update
+            #return
+        self.runPivot(0.6)
+>>>>>>> Stashed changes
