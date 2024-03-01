@@ -31,6 +31,8 @@ class ShooterCommand(commands2.CommandBase):
         self.manualControl = manualControl
         self.manualInput = manualInput
 
+        self.climbing = False
+
         self.addRequirements(self.shooter, self.pivot)
 
     def execute(self):
@@ -59,5 +61,10 @@ class ShooterCommand(commands2.CommandBase):
                 self.pivot.setLoading()
 
         if(self.climbPos()):
+            self.climbing = True
             self.pivot.enable()
             self.pivot.setClimb()
+        elif self.climbing:
+            #disable on button release
+            self.climbing = False
+            self.pivot.pivotMotor.set(0)

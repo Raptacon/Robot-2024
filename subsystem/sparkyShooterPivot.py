@@ -5,8 +5,10 @@ import wpimath
 import wpimath.controller
 import utils.sparkMaxUtils
 class ShooterPivot(commands2.PIDSubsystem):
+    normalPid = {"Kp": 72, "Ki": 0, "Kd": 0}
+    climbPid = {"Kp": 72*4, "Ki": 0, "Kd": 0}
     def __init__(self) -> None:
-        pidController = wpimath.controller.PIDController(72, 0, 0)
+        pidController = wpimath.controller.PIDController(**self.normalPid)
         pidController.setTolerance(0.1)
         super().__init__(pidController, 0)
 
@@ -18,6 +20,10 @@ class ShooterPivot(commands2.PIDSubsystem):
         #scaled to 0..1 = forward - end limit
         #80:1 use 1/73.38 100:1 use 88.056
         self.encoder.setPositionConversionFactor(1/88.056)
+        self.encoder.setPosition(0)
+        #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, 1.0)
+        #self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, True)
+
 
         #get limits
         self.forwardLimit = self.pivotMotor.getForwardLimitSwitch(rev.SparkMaxLimitSwitch.Type.kNormallyClosed)
@@ -71,6 +77,8 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.zeroed = True
             self.pivotMotor.set(0.0)
             self.encoder.setPosition(0)
+            #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, .4)
+            #self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, True)
             return True
 
     def maxPivot(self, speed : float = 0.2):
@@ -85,14 +93,40 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     #sets loading angle
     def setLoading(self):
+        if not self.isEnabled():
+            self.getController().setPID(**self.normalPid)
+            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
+
+        self.enable()
         self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
     def setAmp(self):
+        if not self.isEnabled():
+            self.getController().setPID(**self.normalPid)
+            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
+
+        self.enable()
         self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
-        self.pivotMotor.setSmartCurrentLimit(60)
-        self.setSetpoint(0.05)
+        if self.encoder.getPosition() < 0.05 and not self.isEnabled():
+            """
+            print("close to target PIDing")
+            self.getController().setPID(**self.climbPid)
+            self.getController().set
+            self.getController().reset()
+            self.enable()
+            self.setSetpoint(0.05)
+            """
+            self.pivotMotor.setVoltage(1.0)
+        elif self.isEnabled():
+            print("disabling PID for climb")
+            self.pivotMotor.setSmartCurrentLimit(60)
+            self.disable()
+            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.045)
+        
+        self.pivotMotor.setVoltage(10.0)
+        #self.setSetpoint(0.05)

@@ -130,7 +130,7 @@ class RobotSwerve:
             lambda: self.mechController.getBButton(),
             lambda: self.mechController.getRightTriggerAxis(),
             self.mechController.getYButtonPressed,
-            self.mechController.getXButtonPressed,
+            self.mechController.getXButton,
             self.mechController.getLeftBumper,
             self.mechController.getLeftY
         ))
