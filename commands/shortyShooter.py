@@ -44,6 +44,7 @@ class ShooterCommand(commands2.CommandBase):
             self.shooter.runIntake(0)
 
         voltage = 0
+        # set full speed if enabling shooter
         if self.shooterSpeed() > 0.2:
             voltage = 12.0
         self.shooter.runShooters(voltage)
