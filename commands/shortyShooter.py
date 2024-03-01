@@ -12,7 +12,7 @@ class ShooterCommand(commands2.CommandBase):
                  shooterSpeed : typing.Callable[[], float],
                  pivotToggle: typing.Callable[[], bool],
                  climbPos : typing.Callable[[], bool],
-                 manualControl : typing.Callable[[], bool],
+                 manualPiviotControl : typing.Callable[[], bool],
                  manualInput : typing.Callable[[], float]):
         super().__init__()
 
@@ -28,7 +28,7 @@ class ShooterCommand(commands2.CommandBase):
 
         self.climbPos = climbPos
 
-        self.manualControl = manualControl
+        self.manualPiviotControl = manualPiviotControl
         self.manualInput = manualInput
 
         self.climbing = False
@@ -49,6 +49,7 @@ class ShooterCommand(commands2.CommandBase):
             voltage = 12.0
         self.shooter.runShooters(voltage)
 
+<<<<<<< Updated upstream
         if(self.manualControl()):
             self.pivot.disable()
             self.pivot.runPivot(0.2 * round(self.manualInput()))
@@ -56,6 +57,30 @@ class ShooterCommand(commands2.CommandBase):
             self.pivot.runPivot(0)
 
         if(self.pivotToggle()):
+=======
+        #priority
+        # Manual
+        # cancle manual
+        # climbing
+        # cancle climbing
+        # pos toggle
+        if(self.manualPiviotControl()): #manual
+            self.manualPivot = True
+            self.pivot.disable()
+            self.pivot.runPivot(self.manualInput())
+        elif self.manualPivot: #cancle Manual
+            self.pivot.runPivot(0)
+            self.manualPivot = False
+        elif self.climbPos(): # climbing enabled
+            self.climbing = True
+            self.pivot.enable()
+            self.pivot.setClimb()
+        elif self.climbing: # climbing cancled
+            #disable on button release
+            self.climbing = False
+            self.pivot.pivotMotor.set(0)
+        elif self.pivotToggle(): #toggling piviot
+>>>>>>> Stashed changes
             self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False
@@ -63,12 +88,3 @@ class ShooterCommand(commands2.CommandBase):
             else:
                 self.pivotLoad = True
                 self.pivot.setLoading()
-
-        if(self.climbPos()):
-            self.climbing = True
-            self.pivot.enable()
-            self.pivot.setClimb()
-        elif self.climbing:
-            #disable on button release
-            self.climbing = False
-            self.pivot.pivotMotor.set(0)
