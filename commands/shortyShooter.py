@@ -67,7 +67,7 @@ class ShooterCommand(commands2.CommandBase):
             self.climbing = True
             self.pivot.enable()
             self.pivot.setClimb()
-        elif self.climbing: # climbing cancled
+        elif self.climbing: # climbing canceled
             #disable on button release
             self.climbing = False
             self.pivot.pivotMotor.set(0)
