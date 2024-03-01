@@ -50,17 +50,6 @@ class ShooterCommand(commands2.CommandBase):
             voltage = 12.0
         self.shooter.runShooters(voltage)
 
-<<<<<<< Updated upstream
-        if(self.manualControl()):
-            self.manualPivot = True
-            self.pivot.disable()
-            self.pivot.runPivot(self.manualInput())
-        elif(self.manualControl() and self.manualPivot):
-            self.pivot.runPivot(0)
-            self.manualPivot = False
-
-        if(self.pivotToggle()):
-=======
         #priority
         # Manual
         # cancle manual
@@ -83,7 +72,6 @@ class ShooterCommand(commands2.CommandBase):
             self.climbing = False
             self.pivot.pivotMotor.set(0)
         elif self.pivotToggle(): #toggling piviot
->>>>>>> Stashed changes
             self.pivot.enable()
             if self.pivotLoad:
                 self.pivotLoad = False

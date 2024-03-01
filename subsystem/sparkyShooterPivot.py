@@ -107,7 +107,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        #self.pivotMotor.setSmartCurrentLimit(60)
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
@@ -118,44 +118,20 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        #self.pivotMotor.setSmartCurrentLimit(60)
+        self.pivotMotor.setSmartCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        if self.encoder.getPosition() < 0.05 and not self.isEnabled():
-=======
         if self.getMeasurement() < 0.008 and not self.isEnabled():
             print("limited")
->>>>>>> Stashed changes
-=======
-        if self.encoder.getPosition() < 0.01 and not self.isEnabled():
->>>>>>> aba6fdbcfd8928c598e0a973d72dfe72f70bf744
             self.pivotMotor.setVoltage(1.0)
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            #self.pivotMotor.setSmartCurrentLimit(70)
-            #self.pivotMotor.setSecondaryCurrentLimit(100, 30)
+            self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
-        
-        self.pivotMotor.setVoltage(10.0)
-=======
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
             #return
         self.runPivot(0.6)
->>>>>>> Stashed changes
-=======
-            #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
-            #first round allow settings to update
-            #return
-
-        
-        self.pivotMotor.setVoltage(12.0)
->>>>>>> aba6fdbcfd8928c598e0a973d72dfe72f70bf744
