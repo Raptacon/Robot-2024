@@ -43,7 +43,10 @@ class ShooterCommand(commands2.CommandBase):
         else:
             self.shooter.runIntake(0)
 
-        self.shooter.runShooters(self.shooterSpeed())
+        voltage = 0
+        if self.shooterSpeed() > 0.2:
+            voltage = 12.0
+        self.shooter.runShooters(voltage)
 
         if(self.manualControl()):
             self.pivot.disable()

@@ -21,8 +21,9 @@ class ShooterPivot(commands2.PIDSubsystem):
         #80:1 use 1/73.38 100:1 use 88.056
         self.encoder.setPositionConversionFactor(1/88.056)
         self.encoder.setPosition(0)
-        #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, 1.0)
-        #self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, True)
+        
+        self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, True)
+        self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kReverse, -1.0)
 
 
         #get limits
@@ -43,6 +44,9 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     def setPostion(self, position: float):
         return
+    
+    def periodic(self):
+        super().periodic()
 
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
@@ -77,8 +81,8 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.zeroed = True
             self.pivotMotor.set(0.0)
             self.encoder.setPosition(0)
-            #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, .4)
-            #self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, True)
+            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.01)
+            self.pivotMotor.enableSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, True)
             return True
 
     def maxPivot(self, speed : float = 0.2):
@@ -126,7 +130,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             print("disabling PID for climb")
             self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
-            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.045)
+            self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
         
         self.pivotMotor.setVoltage(10.0)
         #self.setSetpoint(0.05)
