@@ -22,8 +22,6 @@ class Shooter(commands2.Subsystem):
     def periodic(self) -> None:
         wpilib.SmartDashboard.putNumber("left shooter speed", self.leftEncoder.getVelocity())
         wpilib.SmartDashboard.putNumber("right shooter speed", self.rightEncoder.getVelocity())
-        pass
-
 
     def runIntake(self, speed : float):
         self.intakeMotor.set(speed)
