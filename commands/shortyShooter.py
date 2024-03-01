@@ -51,7 +51,7 @@ class ShooterCommand(commands2.CommandBase):
         self.shooter.runShooters(voltage)
 
         if(self.manualControl()):
-            self.manualPivot = True:
+            self.manualPivot = True
             self.pivot.disable()
             self.pivot.runPivot(self.manualInput())
         elif(self.manualControl() and self.manualPivot):
