@@ -124,8 +124,8 @@ class ShooterPivot(commands2.PIDSubsystem):
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
         if self.getMeasurement() < 0.008 and not self.isEnabled():
+            #TODO add function to turn off when close enough
             print("limited")
-            #self.pivotMotor.setVoltage(1.0)
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
