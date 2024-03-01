@@ -102,6 +102,7 @@ class ShooterPivot(commands2.PIDSubsystem):
     #sets loading angle
     def setLoading(self):
         if not self.isEnabled():
+            #allow for other modes to adjust PID
             self.getController().setPID(**self.normalPid)
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
@@ -112,6 +113,7 @@ class ShooterPivot(commands2.PIDSubsystem):
     #sets amp angle
     def setAmp(self):
         if not self.isEnabled():
+            #allow for other modes to adjust PID
             self.getController().setPID(**self.normalPid)
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
@@ -120,21 +122,14 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.setSetpoint(0.4)
 
     def setClimb(self):
+        #norminal goal is 0.05 for climbing postion
         if self.encoder.getPosition() < 0.05 and not self.isEnabled():
-            """
-            print("close to target PIDing")
-            self.getController().setPID(**self.climbPid)
-            self.getController().set
-            self.getController().reset()
-            self.enable()
-            self.setSetpoint(0.05)
-            """
             self.pivotMotor.setVoltage(1.0)
         elif self.isEnabled():
-            print("disabling PID for climb")
+            #climbing we need increased current, we will not use PID since we need a strong quick pull
+            # and a soft limit will be used to disable output
             self.pivotMotor.setSmartCurrentLimit(60)
             self.disable()
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
         
         self.pivotMotor.setVoltage(10.0)
-        #self.setSetpoint(0.05)
