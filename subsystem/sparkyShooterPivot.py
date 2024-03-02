@@ -149,8 +149,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
             self.disable()
-            self.runPivot(0.0)
-            if self.setCurrentLimit(60):
+            if not self.setCurrentLimit(60):
                 #allows a cycle after setting current
                 return
 
