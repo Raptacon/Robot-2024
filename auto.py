@@ -6,7 +6,6 @@ from commands.sparkyAuto import HandOff
 from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyIntake import SparkyIntake
 import logging
-from wpimath.geometry import Pose2d
 
 log = logging.getLogger("Auto")
 
