@@ -51,10 +51,12 @@ class ShooterPivot(commands2.PIDSubsystem):
         return
     
     def setCurrentLimit(self, limitAmps: int = 20):
+        """ sets the motor current limit. Returs if already set"""
         if self.currentLimit == limitAmps:
-            return
+            return True
         self.currentLimit = limitAmps
         self.pivotMotor.setSmartCurrentLimit(limitAmps)
+        return False
     
     def periodic(self):
         super().periodic()
@@ -146,8 +148,12 @@ class ShooterPivot(commands2.PIDSubsystem):
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            self.setCurrentLimit(60)
             self.disable()
+            self.runPivot(0.0)
+            if self.setCurrentLimit(60):
+                #allows a cycle after setting current
+                return
+
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
             #return
