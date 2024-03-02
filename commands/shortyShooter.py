@@ -58,6 +58,8 @@ class ShooterCommand(commands2.CommandBase):
         # pos toggle
         if(self.manualPivotControl()): #manual
             self.manualPivot = True
+            if(not self.pivot.currentLimit == 60):
+                self.pivot.setCurrentLimit(60)
             self.pivot.disable()
             self.pivot.runPivot(self.manualInput())
         elif self.manualPivot: #cancle Manual

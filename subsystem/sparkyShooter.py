@@ -14,8 +14,8 @@ class Shooter(commands2.Subsystem):
         utils.sparkMaxUtils.configureSparkMaxCanRates(self.rightShooterMotor)
         self.rightShooterMotor.setInverted(False)
 
-        self.leftShootMotor.enableVoltageCompensation(11.5)
-        self.rightShooterMotor.enableVoltageCompensation(11.5)
+        self.leftShootMotor.enableVoltageCompensation(12)
+        self.rightShooterMotor.enableVoltageCompensation(12)
         self.leftEncoder = self.leftShootMotor.getEncoder()
         self.rightEncoder = self.rightShooterMotor.getEncoder()
 
