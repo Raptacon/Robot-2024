@@ -99,7 +99,7 @@ class RobotSwerve:
             self.autonomousCommand.schedule()
 
     def getAutonomousCommand(self):
-        return SparkyShoot(self.shooter, self.intake)
+        return SparkyShoot(self.shooter, self.intake, self.driveTrain)
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
