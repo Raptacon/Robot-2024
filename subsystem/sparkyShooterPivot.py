@@ -7,6 +7,7 @@ import utils.sparkMaxUtils
 class ShooterPivot(commands2.PIDSubsystem):
     normalPid = {"Kp": 72, "Ki": 0, "Kd": 0}
     climbPid = {"Kp": 72*4, "Ki": 0, "Kd": 0}
+    currentLimit = None
     def __init__(self) -> None:
         pidController = wpimath.controller.PIDController(**self.normalPid)
         pidController.setTolerance(0.1)
@@ -50,6 +51,8 @@ class ShooterPivot(commands2.PIDSubsystem):
         return
     
     def setCurrentLimit(self, limitAmps: int = 20):
+        if self.currentLimit == limitAmps:
+            return
         self.currentLimit = limitAmps
         self.pivotMotor.setSmartCurrentLimit(limitAmps)
     
@@ -121,8 +124,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        if(not self.currentLimit == 20):
-            self.setCurrentLimit()
+        self.setCurrentLimit(20)
         self.setSetpoint(0)
 
     #sets amp angle
@@ -133,8 +135,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
 
         self.enable()
-        if(not self.currentLimit == 20):
-            self.setCurrentLimit()
+        self.setCurrentLimit(20)
         self.setSetpoint(0.4)
 
     def setClimb(self):
@@ -145,8 +146,7 @@ class ShooterPivot(commands2.PIDSubsystem):
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            if(not self.currentLimit == 60):
-                self.setCurrentLimit(60)
+            self.setCurrentLimit(60)
             self.disable()
             #self.pivotMotor.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
             #first round allow settings to update
