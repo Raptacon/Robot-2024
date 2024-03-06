@@ -2,7 +2,7 @@
 
 ![Build link](https://github.com/Raptacon/Robot-2023/actions/workflows/robot_ci.yml)
 
-## Welcome to Robot 2023
+## Welcome to Robot 2024
 
 Please take a look at the [wiki](https://github.com/Raptacon/Robot-2023/wiki) for the most up to date documenation
 
@@ -14,6 +14,12 @@ test
 According to [Robotpy](https://robotpy.readthedocs.io/en/stable/faq.html#what-version-of-python-do-robotpy-projects-use) the "RobotPy WPILib on the roboRIO uses the latest version of Python 3 at kickoff". The version of Python for 2024 you want to install is [3.11.7](https://www.python.org/downloads/release/python-3117/) or [3.12.1](https://www.python.org/downloads/release/python-3121/).
 
 There is a general setup that is needed for each OS before you can build the code. Please look at the ![FRC Zero to Robot](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html) to get the initial setup for NI and then ![WPILib](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html) which has an amazing need to mount an ISO this year so make sure to pay attention to the "Mount" instructions. Once you have those completed in theory you can clone our code and type make. Make sure to see the OS specific instructions below.
+
+## Pyenv
+
+You almost certainly want to install pyenv to manage your various python versions. You still want to use venv but pyenv manages your overall python
+
+There is a good tutorial (here)[https://realpython.com/intro-to-pyenv/]
 
 ## OSX Users
 
@@ -131,3 +137,23 @@ Power shell does not allow sccripts on windows now by default
 * Select A when prompted
 >>>>>>> ad7e0ef862389d91723a336a9e63fe0e7932085f
 
+# Information
+
+## Deployed Robot Version
+
+When code is deployed to the robot, a deploy.json file will be automatically created with deploying computer information
+
+The robot has lots of information in it. This now includes the version of code (git SHA), where it was deployed and in theory who did it. The reality is that code is deployed (like a lot) from the drive team laptop, so the who may be a bit misleading. To find this information, just look in the SmartDashboard for `Robot Version` (git SHA), `Git Branch`, `Deploy Host` and `Deploy User`.
+
+There is a /home/lvuser/deploy.json file which at the time of this writing (2023-03-03) looks like:
+```json
+{
+  "deploy-host": "DESKTOP-80HA89O",
+  "deploy-user": "ehsra",
+  "deploy-date": "2023-03-02T17:54:14",
+  "code-path": "C:\\Users\\ehsra\\Documents\\Github\\Robot-2023",
+  "git-hash": "3f4e89f138d9d78093bd4869e0cac9b61becd2b9",
+  "git-desc": "3f4e89f-dirty",
+  "git-branch": "fix-recal-nbeasley"
+}
+```

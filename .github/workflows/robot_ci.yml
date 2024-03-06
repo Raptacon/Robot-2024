@@ -17,7 +17,7 @@ jobs:
       timeout-minutes: 2
       uses: actions/setup-python@v1
       with:
-        python-version: 3.12.1
+        python-version: 3.12.*
 
     - name: Install dependencies
       timeout-minutes: 5
@@ -39,7 +39,7 @@ jobs:
       timeout-minutes: 2
       uses: actions/setup-python@v1
       with:
-        python-version: 3.12.1
+        python-version: 3.12.*
 
     - name: Install dependencies
       timeout-minutes: 5
@@ -60,11 +60,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Set up Python 3.12.1 
+    - name: Set up Python 3.12.* 
       timeout-minutes: 2
       uses: actions/setup-python@v1
       with:
-        python-version: 3.12.1
+        python-version: 3.12.*
 
     - name: Lint with flake8 critical
       timeout-minutes: 1
@@ -84,10 +84,15 @@ jobs:
       timeout-minutes: 2
       uses: actions/setup-python@v1
       with:
-        python-version: 3.12.1
+        python-version: 3.12.*
 
     - name: Lint with flake8 extra
       timeout-minutes: 1
       run: |
         pip install flake8
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --ignore E265,E232,W391,E302 --exclude */tests/pyfrc*,utils/yaml/*,.venv*/,venv*/
+      # permissions:
+      #       contents: read
+      #       packages: read
+      #       # To report GitHub Actions status checks
+      #       statuses: write
