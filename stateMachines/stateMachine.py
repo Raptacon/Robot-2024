@@ -33,7 +33,7 @@ class StateMachine():
             self.currentState.run()
         except Exception:
             #return false if failure
-            print("ERROR! Encountered error while running.")
+            self.say("ERROR! Encountered error while running.")
             self.reset()
             return False
         
@@ -44,7 +44,7 @@ class StateMachine():
         if len(newState) != 0:
             setStateStatus = self.setState(newState)
             if not setStateStatus:
-                print(f"ERROR! Transition from {self.currentState} to {newState} cannot be found. Check that the state is correctly added or named!")
+                self.say(f"ERROR! Transition from {self.currentState} to {newState} cannot be found. Check that the state is correctly added or named!")
                 self.reset()
     
             return setStateStatus
@@ -57,14 +57,14 @@ class StateMachine():
         """
         for _state in self.states:
             if _state.name == state:
-                if self.debugMode: print(f"State changed to {_state}")
+                if self.debugMode: self.say(f"State changed to {_state}")
                 self.currentState = _state
-            
+                
                 try:
                     self.currentState.enter()
                 except Exception:
                     #return true so we just get the on enter fail
-                    print(f"ERROR! On enter in {_state} failed.")
+                    self.say(f"ERROR! On enter in {_state} failed.")
                     self.reset()
                     return True
 
@@ -98,7 +98,7 @@ class StateMachine():
             #i hate this
             if self.lastState != None:
                 self.setState(str(self.lastState))
-                if self.debugMode: print(f"Restoring state {self.lastState}\n")
+                if self.debugMode: self.say(f"Restoring state {self.lastState}\n")
                 self.lastState = None
     
     def disable(self):
@@ -126,6 +126,12 @@ class StateMachine():
         """
         if not self.containsState(state): return
         self.priorityState = state
+    
+    def say(self, message:str):
+        """
+        This exists to just put the state machine in front of a print statement automatically
+        """
+        print(f"{self.__class__.__name__}: {message}")
 
     @property
     def state(self):

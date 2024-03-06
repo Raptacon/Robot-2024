@@ -15,7 +15,7 @@ from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
-from stateMachines.testIntake import TestIntakeStateMachine
+from stateMachines.ultraStateMachine import UltraStateMachine
 
 import math
 kDriveControllerIdx = 0
@@ -59,16 +59,16 @@ class RobotSwerve:
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
 
-        self.intake.setDefaultCommand(Intake(
-            self.intake,
-            self.intakePivotController,
-            lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
-            lambda: self.mechController.getLeftBumper(),
-            lambda: self.mechController.getAButton(),
-            lambda: self.mechController.getBButton()
-        ))
-
-        self.intakeSM = TestIntakeStateMachine(debugMode=True, intake=self.intake.getDefaultCommand())
+        # self.intake.setDefaultCommand(Intake(
+        #     self.intake,
+        #     self.intakePivotController,
+        #     lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
+        #     lambda: self.mechController.getLeftBumper(),
+        #     lambda: self.mechController.getAButton(),
+        #     lambda: self.mechController.getBButton()
+        # ))
+        
+        self.intakeSM = UltraStateMachine(debugMode=True)
 
         '''
         self.driveTrain.setDefaultCommand(DefaultDrive(

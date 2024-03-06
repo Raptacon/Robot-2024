@@ -4,11 +4,11 @@ import wpilib
 #stateMachines\testIntakeDiagram.md
 class TestIntakeStateMachine(StateMachine):
     def __init__(self, states=[], initialState=None, debugMode=False, intake=None):
-
-        if intake == None:
-            raise Exception("Must include intake in intake state machine!")
         
-        self.intake = intake
+        # if intake == None:
+        #     raise Exception("Must include intake in intake state machine!")
+        
+        # self.intake = intake
 
         self.debugTimer = wpilib.Timer()
         self.debugTimer.start()
