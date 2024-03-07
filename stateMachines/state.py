@@ -1,7 +1,15 @@
 class State():
+    #enter, run, transition should prob be callables just so that its expicit in its type
+    #but also screw that cause idk what a callable is
     def __init__(self, name:str, enter=None, run=None, transition=None, cannotInterupt=False) -> None:
         """
-        Defines a state. Takes a name, enter function, and transition function
+        State to be used with a finite state machine
+
+        Args:
+            Name : Key value to be given to the name. This name is how states will transition to it
+            Enter : Evaluated upon entering state. Executed the same tick that it is transitioned to.
+            Run : Evaluated every time the state machine is run
+            Transition : Must return a string with a name for the state to transition into. Return "" to transition to self
         """
         self.name = name
 

@@ -10,7 +10,7 @@ class UltraStateMachine(StateMachine):
         self.shooterSM.enable()
 
         states = []
-
+        
         run = State(
             name="Run",
             run=lambda: self.runMachines(),
@@ -20,7 +20,8 @@ class UltraStateMachine(StateMachine):
         
         handshake = State(
             name="Handshake",
-            enter=lambda: self.organizeHandshake()
+            enter=lambda: self.organizeHandshake(),
+            run=lambda: self.runHandshake()
         )
         states.append(handshake)
 
@@ -33,5 +34,9 @@ class UltraStateMachine(StateMachine):
         if str(self.intakeSM.state) == "DoneState":
             self.setState("Handshake")
     
+    def runHandshake(self):
+        self.shooterSM.run()
+        self.shooterSM.overrideState("OtherTest")
+    
     def organizeHandshake(self):
-        self.shooterSM.overrideState("Test")
+        self.shooterSM.setState("Test")

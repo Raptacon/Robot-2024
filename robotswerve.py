@@ -20,6 +20,7 @@ from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyShooterPivot import ShooterPivot
 
 from subsystem.sparkyLeds import Leds
+from stateMachines.ultraStateMachine import UltraStateMachine
 
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
@@ -66,6 +67,7 @@ class RobotSwerve:
         self.rotLimiter = wpimath.filter.SlewRateLimiter(3)
 
         self.leds = Leds()
+        self.intakeSM = UltraStateMachine(debugMode=True)
 
         commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
@@ -172,8 +174,12 @@ class RobotSwerve:
         wpilib.SmartDashboard.putNumber("Pivot Angle:", 0.5)
         wpilib.SmartDashboard.putNumber("Shooter Angle:", 310)
 
+        self.intakeSM.enable()
+
 
     def testPeriodic(self) -> None:
+        self.intakeSM.run()
+
         wheelAngle = wpilib.SmartDashboard.getNumber("Wheel Angle", 0) # noqa: E117,F841
         wheelSpeed = wpilib.SmartDashboard.getNumber("Wheel Speed", 0) # noqa: E117,F841
         pivotAngle = wpilib.SmartDashboard.getNumber("Pivot Angle:", 0.5) # noqa: E117,F841

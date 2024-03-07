@@ -2,9 +2,16 @@ from stateMachines.state import State
 
 class StateMachine():
     def __init__(self, states=None, initialState=None, debugMode=False):
+        """
+        Finite state machine that uses string-state dictionaries
+
+        Args:
+            States : a list of states
+            Initial state : the state to which the root state connects
+            Debug mode : If true, allows for print statements when switching states or enabling/disabling state machine
+        """
         self.states = states
         self.isActive = False
-        self.priorityState = None
         self.lastState = None
 
         self.debugMode = debugMode
@@ -20,14 +27,11 @@ class StateMachine():
     def run(self) -> bool:
         """
         Run the current state in the machine.
+
+        Returns true if state ran without error
         """
 
         if not self.isActive: return
-
-        #if an override state was called, set it to be active
-        if self.currentState.cannotInterupt == False and self.priorityState:
-            self.setState(self.priorityState)
-            self.priorityState = None
 
         try:
             self.currentState.run()
@@ -37,8 +41,6 @@ class StateMachine():
             self.reset()
             return False
         
-        #check if a priority state was set during run
-        if self.priorityState: return True
 
         newState = self.currentState.getTransition()
         if len(newState) != 0:
@@ -53,7 +55,7 @@ class StateMachine():
         
     def setState(self, state:str) -> bool:
         """
-        Set the current state in the machine.
+        Set the current state in the machine. Does not care about whether it is interuptable
         """
         for _state in self.states:
             if _state.name == state:
@@ -85,7 +87,7 @@ class StateMachine():
         """
         Reset the state to the root (transitions to whatever state[0] was if not defined)
         """
-        if self.debugMode: print("Resetting machine to root state.\n")
+        if self.debugMode: self.say("Resetting machine to root state.\n")
         self.currentState = self.rootState
 
     def enable(self):
@@ -94,7 +96,7 @@ class StateMachine():
         """
         if self.isActive == False:
             self.isActive = True
-
+        
             #i hate this
             if self.lastState != None:
                 self.setState(str(self.lastState))
@@ -108,7 +110,7 @@ class StateMachine():
         if self.isActive == True:
             self.isActive = False
             self.lastState = self.currentState
-            if self.debugMode: print(f"Caching state {self.lastState}\n")
+            if self.debugMode: self.say(f"Caching state {self.lastState}\n")
             self.reset()
         
     def addState(self, state):
@@ -118,18 +120,33 @@ class StateMachine():
         if isinstance(state, State):
             self.states.append(state)
         else:
-            print("Please pass a State() object")
-
+            self.say("Please pass a State() object")
+    
+    #this is probably a dumb name.
+    #will come up with something better later
     def overrideState(self, state):
         """
-        Force a transition to this state (applies on the next StateMachine.run())
+        Force a transition to this state
         """
-        if not self.containsState(state): return
-        self.priorityState = state
+        #check we aren't forcing a transition to the current state
+        if state == str(self.currentState): return
+
+        #check state exists
+        if not self.containsState(state):
+            self.say("Requested overrided state not found.")
+            return
+        
+        #check state cannot be interupted
+        if self.currentState.cannotInterupt == True:
+            self.say(f"Current state, {self.currentState}, is set to uninteruptable. Use setState() if you don't care")
+            return
+        
+        self.say(f"Forcing transition to {state}.")
+        self.setState(state)
     
     def say(self, message:str):
         """
-        This exists to just put the state machine in front of a print statement automatically
+        Print statement with class name in front. 
         """
         print(f"{self.__class__.__name__}: {message}")
 
