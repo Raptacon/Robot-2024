@@ -145,7 +145,7 @@ How to run:
 3. find the log you want to open in the file explorer(you may want to sort by recent if that is not already the default you have)
 
 Extra things:
-* There are multiple tabs you can open in AdvantageScope, the ones you will use the most are going to be: Line Graph, Table, and Joysticks.
+* There are multiple tabs you can open in AdvantageScope, the ones you will use the most are going to be: Line Graph, Table, and Joysticks(if you are in live time).
 
 * Delete the logs after you use them.
 # Information
