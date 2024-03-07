@@ -1,42 +1,61 @@
 ```mermaid
-flowchart TB
-    mRoot{ROOT}--->mRun(Run machines)
-    mRun-->|Initiate handshake|mHand(Handshake)
+flowchart BT
+    mRoot{Root}
+    mRun(Run)
+    mPrepHandoff(Prepare handoff)
+    mHandoff(Handoff)
 
-    subgraph Potential intake system
-        direction TB
-        ROOT{ROOT}-->|Intake intitated|LowerIntake(Lower intake)
-        LowerIntake-->LowerStandby(Standby)
-        LowerStandby-->Spin(Spin intake motor)
-
-        Spin-->|Error|Eject(Eject piece)
-        Eject-->LowerStandby
-
-        Spin-->|Successful intake|RaiseIntake(Raise intake)
-        RaiseIntake-->IntakeHandshake(Intake handshake.
-        This would be initiated by the intake shooter manager)
-        RaiseIntake-->|Handshake fails for some reason|HandshakeEject(Lower and eject)
-
-        IntakeHandshake-->|Successful handoff|LowerIntake
-    end
+    mRoot-->mRun
+    mRun-->mHandoff
+    mHandoff-->mRun
 
     subgraph Shooter
-        direction TB
-        SHOOTER_ROOT{ROOT}-->ShooterIdle(Idle shooter position)
-        ShooterIdle-->|Handshake initiated|LowerShooter(Lower shooter)
-        LowerShooter-->ShooterHandshake(Shooter handshake)
-        ShooterHandshake-->|Handshake fails|ShooterIdle
+        sRoot{Shooter Root}
+        sIdle(Idle)
+        sLower(Lower shooter)
+        sWaitForHandoff(Wait for handoff)
+        sHandoff(Handoff)
+        sRaise(Raise shooter)
+        sPrep(Prep for fire)
+        sFire(Fire note)
 
-        ShooterHandshake-->|Handshake success|RaiseShooter(Raise shooter)
-        RaiseShooter-->PrepFire(Prepare for fire.
-        Set to some predefined rotation)
-        PrepFire-->|Go ahead given|Fire(Fire)
-        Fire-->ShooterIdle
-        PrepForHandShooter(Prep for handshake)-->RaiseShooter
+        sRoot-->sIdle
+        sLower-->sWaitForHandoff
+        sWaitForHandoff-->sHandoff
+        sHandoff-->sRaise
+        sRaise-->sPrep
+        sPrep-->sFire
+        sFire-->sIdle
     end
 
+    subgraph Intake
+        iRoot{Intake root}
+        iIdle(Idle)
+        iLower(Lower intake)
+        iStandby(Standby for note)
+        iIntake(Intake note)
+        iEject(Eject)
+        iRaise(Raise intake)
+        iWaitForHandoff(Wait for handoff go-ahead)
+        iHandoff(Handoff note)
 
-    IntakeHandshake-->|Initiate handshake|mHand
-    mHand-->PrepForHandShooter
-    mHand-->|Handshake is done|mRun
+        iRoot-->iIdle
+        iIdle-->|Note sighted|iLower
+        iLower-->iStandby
+        iStandby-->|Within proximity of note|iIntake
+        iIntake-->|Error in intake|iEject-->iIdle
+        iIntake-->iRaise
+
+        iRaise-->iWaitForHandoff
+        iWaitForHandoff-->iHandoff
+        iHandoff-->iIdle
+    end
+
+    iRaise-->|Begin handoff 
+    when this state is active|mPrepHandoff
+    mPrepHandoff-->mHandoff
+    mHandoff-->|Go-ahead|iWaitForHandoff
+
+    mPrepHandoff-->|Begin handoff prep|sLower
+    mHandoff-->|Go-ahead|sWaitForHandoff
 ```
