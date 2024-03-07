@@ -18,14 +18,31 @@ class TestShooterStateMachine(StateMachine):
             name="Test",
             enter=lambda: self.debugTimer.reset(),
             cannotInterupt=True,
-            transition=lambda: "OtherTest" if self.debugTimer.advanceIfElapsed(1) else ""
+            transition=lambda: "Wait" if self.debugTimer.advanceIfElapsed(2) else ""
         )
         states.append(test)
 
-        otherTest = State(
-            name="OtherTest",
-            enter=lambda: print("done")
+        wait = State(
+            name="Wait"
         )
-        states.append(otherTest)
+        states.append(wait)
+
+        handoff = State(
+            name = "Handoff",
+            transition=lambda: "PrepFire"
+        )
+        states.append(handoff)
+
+        prepFire = State(
+            name="PrepFire",
+            transition=lambda: "Fire"
+        )
+        states.append(prepFire)
+
+        fire = State(
+            name="Fire",
+            transition=lambda: "Standby"
+        )
+        states.append(fire)
         
         super().__init__(states, initialState, debugMode)

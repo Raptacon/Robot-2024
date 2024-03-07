@@ -2,7 +2,7 @@ from stateMachines.testIntake import *
 from stateMachines.testShooter import *
 
 class UltraStateMachine(StateMachine):
-    def __init__(self, states=[], initialState=None, debugMode=False):
+    def __init__(self, debugMode=False):
         self.intakeSM = TestIntakeStateMachine(debugMode=debugMode)
         self.shooterSM = TestShooterStateMachine(debugMode=debugMode)
 
@@ -18,25 +18,39 @@ class UltraStateMachine(StateMachine):
         )
         states.append(run)
         
-        handshake = State(
-            name="Handshake",
-            enter=lambda: self.organizeHandshake(),
-            run=lambda: self.runHandshake()
+        prepHandoff = State(
+            name="PrepHandoff",
+            enter=lambda: self.beginPrepHandoff(),
+            transition=lambda: "Handoff" if (str(self.intakeSM.state) == "Wait" and str(self.shooterSM.state) == "Wait") else ""
         )
-        states.append(handshake)
+        states.append(prepHandoff)
 
-        super().__init__(states, initialState, debugMode)
+        #This goes off for one tick and simply changes the state machines to handoff mode.
+        #At this point, the master machine shouldn't care what happens
+        handoff = State(
+            name="Handoff",
+            enter=lambda: self.initHandoff(),
+            transition=lambda: "Run"
+        )
+        states.append(handoff)
+
+        super().__init__(states, None, debugMode)
     
-    def runMachines(self):
+    def run(self) -> bool:
+        #master machine ALWAYS runs these two machines
         self.intakeSM.run()
         self.shooterSM.run()
+        return super().run()
+    
+    #standard run
+    #check for intake machine being in the raise state to prep handoff
+    def runMachines(self):
+        if str(self.intakeSM.state) == "Raise" and str(self.shooterSM.state) == "Standby":
+            self.setState("PrepHandoff")
 
-        if str(self.intakeSM.state) == "DoneState":
-            self.setState("Handshake")
-    
-    def runHandshake(self):
-        self.shooterSM.run()
-        self.shooterSM.overrideState("OtherTest")
-    
-    def organizeHandshake(self):
+    def beginPrepHandoff(self):
         self.shooterSM.setState("Test")
+
+    def initHandoff(self):
+        self.intakeSM.setState("Handoff")
+        self.shooterSM.setState("Handoff")

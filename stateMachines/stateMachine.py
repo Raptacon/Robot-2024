@@ -21,18 +21,21 @@ class StateMachine():
         states.append(self.rootState)
 
         self.currentState = self.rootState
-        self.run()
-    
+        
     #mermaid.md
     def run(self) -> bool:
         """
         Run the current state in the machine.
 
-        Returns true if state ran without error
+        Returns:
+            True -> Success
+            
+            False -> Error or invalid transition
         """
 
         if not self.isActive: return
 
+        #attempt to run current state
         try:
             self.currentState.run()
         except Exception:
@@ -40,12 +43,13 @@ class StateMachine():
             self.say("ERROR! Encountered error while running.")
             self.reset()
             return False
-        
 
+        #evaluate transition of state
         newState = self.currentState.getTransition()
         if len(newState) != 0:
             setStateStatus = self.setState(newState)
             if not setStateStatus:
+                #force a reset if status returns false
                 self.say(f"ERROR! Transition from {self.currentState} to {newState} cannot be found. Check that the state is correctly added or named!")
                 self.reset()
     
@@ -74,7 +78,7 @@ class StateMachine():
 
         return False
     
-    def containsState(self, state):
+    def containsState(self, state:str):
         """
         Check if a state with the given name exists
         """
@@ -92,7 +96,7 @@ class StateMachine():
 
     def enable(self):
         """
-        Enable the machine
+        Enable the machine. This must be called after creating a machine.
         """
         if self.isActive == False:
             self.isActive = True
@@ -153,7 +157,7 @@ class StateMachine():
     @property
     def state(self):
         """
-        Get current state
+        Current state of machine
         """
         if self.currentState != None:
             return self.currentState
