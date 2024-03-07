@@ -1,5 +1,4 @@
 import wpilib
-import wpimath
 import math
 
 from subsystem.swerveDriveTrain import Drivetrain
@@ -51,14 +50,16 @@ driverStationEntries = [
     ["enabled", BooleanLogEntry, "enabled"]
 ]
 
-class Telemetry():    
-    def __init__(self, 
-                 driverController: wpilib.XboxController = None, 
-                 mechController: wpilib.XboxController = None,
-                 driveTrain: Drivetrain = None,
-                 driverStation: wpilib.DriverStation = None
 
-                 ):
+class Telemetry:
+
+    def __init__(
+        self,
+        driverController: wpilib.XboxController = None,
+        mechController: wpilib.XboxController = None,
+        driveTrain: Drivetrain = None,
+        driverStation: wpilib.DriverStation = None,
+    ):
         self.driverController = driverController
         self.mechController = mechController
         self.odometryPosition = driveTrain.odometry
@@ -75,7 +76,6 @@ class Telemetry():
             setattr(self, entryname, entrytype(self.datalog, "swervedrivetrain/" + logname))
         for entryname, entrytype, logname in driverStationEntries:
             setattr(self, entryname, entrytype(self.datalog, "driverstation/" + logname))
-
 
     def getDriverControllerInputs(self):
         """
@@ -123,7 +123,7 @@ class Telemetry():
 
     def getOdometryInputs(self):
         """
-        Records the data for the positions of the bot in a field, 
+        Records the data for the positions of the bot in a field,
         Gives the x position, y position and rotation
         """
         pose = self.odometryPosition.getPose()
@@ -144,8 +144,8 @@ class Telemetry():
 
     def getDriverStationInputs(self):
         """
-        Gets the inputs of some match/general robot things, 
-        the things being: Alliance color and what mode it is in and 
+        Gets the inputs of some match/general robot things,
+        the things being: Alliance color and what mode it is in and
         if it is enabled
         """
         alliance = "No Alliance"
