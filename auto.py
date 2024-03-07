@@ -1,39 +1,24 @@
 import commands2
 import commands2.cmd
-from commands.goToDist import GoToDist
-from commands.autoGrabber import AutoGrabber
-from subsystems.actuators.breadboxArmController import ArmController, getArmInstantCommand
-from subsystems.arm.grader import Grabber
-from subsystems.drivetrains.westcoast import Westcoast
-import wpilib
-import navx
+from commands.autoDrive import AutoDrive
+from subsystem.swerveDriveTrain import Drivetrain
+from commands.sparkyAuto import HandOff
+from subsystem.sparkyShooter import Shooter
+from subsystem.sparkyIntake import SparkyIntake
 import logging
-from position import EPosition
+
 log = logging.getLogger("Auto")
-class Autonomous(commands2.SequentialCommandGroup):
-    def __init__(self, drive : Westcoast, navx : navx.AHRS, armController : ArmController, grabber : Grabber, position : int) -> None:
+
+class SparkyShoot(commands2.SequentialCommandGroup):
+    def __init__(self, shooter : Shooter, intake : SparkyIntake, drive: Drivetrain) -> None:
         super().__init__()
-       
-        distance1 = wpilib.SmartDashboard.getNumber("Auto Distance 1", 7.25)
-        distance2 = wpilib.SmartDashboard.getNumber("Auto Distance 2", 7.25)
-        turnAngle = 180
-
-        log.info(f"Auto Distance 1: {distance1}")
-        log.info(f"Auto Distance 2: {distance2}")
-        log.info(f"Auto Turn Angle: {turnAngle}")
-       
-        if (position == EPosition.CENTER):
-            self.addCommands(
-                getArmInstantCommand(armController, armController.setBackTop),
-                commands2.WaitCommand(2),
-                commands2.PrintCommand("Arm movement finished"),
-                AutoGrabber(grabber, 1, False),
-                commands2.PrintCommand("output cone"),
-                GoToDist(distance1, drive),
-                commands2.PrintCommand(f"GoToDist finished {distance1}")
-                )
-        if position == EPosition.LEFT:
-            pass
-        if position == EPosition.RIGHT:
-            pass
-
+        self.addCommands(
+            commands2.PrintCommand("Running Shooter"),
+            HandOff(shooter, intake, 2, 0.4),
+            commands2.PrintCommand("Finished Shooter"),
+            AutoDrive(.01, 0, -.1, 0.2, True, drive), #align wheels
+            AutoDrive(1.0, 0, 0.0, 0.0, True, drive), #safe the drive train until we are stable
+            commands2.PrintCommand("AutoDrive Align finished"),
+            AutoDrive(1.2, 0, -0.2, 0.0, True, drive), #drive forward about 6 ft
+            commands2.PrintCommand("AutoDrive move finished"),
+        )
