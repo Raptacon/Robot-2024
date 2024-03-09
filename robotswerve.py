@@ -27,6 +27,7 @@ from commands.resetfielddrive import ResetFieldDrive
 
 from auto import SparkyShoot
 
+from apriltags import DrivePoseEstimator
 
 from wpilib import CameraServer
 kDriveControllerIdx = 0
@@ -83,6 +84,8 @@ class RobotSwerve:
         wpilib.SmartDashboard.putString(
             "Deploy User", self.getDeployInfo("deploy-user")
         )
+
+        wpilib.CameraServer.launch("vision.py:main")
 
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
@@ -149,7 +152,8 @@ class RobotSwerve:
                  "Shooter Cal",
                  "Shoot Piviot Zero",
                  "Shoot Piviot Reverse",
-                 "Shoot Piviot Pos"]
+                 "Shoot Piviot Pos",
+                 "Photon Vision"]
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
@@ -157,6 +161,7 @@ class RobotSwerve:
         self.calEn = False
         self.calDis = False
         self.testChooser = wpilib.SendableChooser()
+        self.drivetrainPoseEstimator = DrivePoseEstimator(self.driveTrain)   
         for i in self.testModes:
             self.testChooser.addOption(i, i)
         self.testChooser.setDefaultOption("Drive Disable","Drive Disable")
@@ -207,6 +212,9 @@ class RobotSwerve:
                 self.shooterPivot.setSetpoint(pivotAngle)
                 self.shooterPivot.periodic()
                 pass
+            case "Photon Vision":
+                self.drivetrainPoseEstimator.setUseAprilTags(True)
+                print(self.drivetrainPoseEstimator.getCurEstPose())
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 

@@ -84,6 +84,16 @@ class Drivetrain(commands2.SubsystemBase):
         self.ang = 0
         self.iteration = 0
         
+    def getKinematics(self) -> wpimath.kinematics.SwerveDrive4Kinematics:
+        return self.kinematics
+
+    def getModuleStates(self) -> list[wpimath.kinematics.SwerveModulePosition]:
+        return [
+            self.swerveModules[1].getPosition(),
+            self.swerveModules[3].getPosition(),
+            self.swerveModules[0].getPosition(),
+            self.swerveModules[2].getPosition(),
+            ]
 
     def getHeading(self) -> Rotation2d:
         return Rotation2d.fromDegrees(self.imu.getFusedHeading() - self.headingOffset)
