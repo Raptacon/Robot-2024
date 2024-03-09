@@ -9,8 +9,11 @@ class UltraStateMachine(StateMachine):
         self.intakeSM.enable()
         self.shooterSM.enable()
 
+        self.preppingForHandoff = False
+
         states = []
         
+        #run machines as normal
         run = State(
             name="Run",
             run=lambda: self.runMachines(),
@@ -18,10 +21,11 @@ class UltraStateMachine(StateMachine):
         )
         states.append(run)
         
+        #force both machines to begin handoff prep
         prepHandoff = State(
             name="PrepHandoff",
-            enter=lambda: self.beginPrepHandoff(),
-            transition=lambda: "Handoff" if (str(self.intakeSM.state) == "Wait" and str(self.shooterSM.state) == "Wait") else ""
+            run=lambda: self.attemptPrepHandoff(),
+            transition=lambda: "Handoff" if (str(self.intakeSM.state) == "Wait" and str(self.shooterSM.state) == "Wait") else "" #possibly should add edge case for if certain time elapses
         )
         states.append(prepHandoff)
 
@@ -50,8 +54,11 @@ class UltraStateMachine(StateMachine):
         if str(self.intakeSM.state) == "Wait" and str(self.shooterSM.state) == "Standby":
             self.overrideState("PrepHandoff")
     
-    def beginPrepHandoff(self):
-        self.shooterSM.overrideState("Lower")
+    def attemptPrepHandoff(self):
+        #keep trying to go to lower until shooter is ready
+        if not self.preppingForHandoff:
+            self.shooterSM.overrideState("Lower")
+            self.preppingForHandoff = True
     
     def runHandoff(self):
         self.intakeSM.overrideState("Handoff")

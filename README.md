@@ -52,11 +52,6 @@ Then create a virtual environment through the command "python -m venv .venv".
 Once the environment is created run the command "pip install -r requirements.txt" to install the necessary packages to work, and run the code.
 Now that robotpy is installed, makes sure that you have the file pyproject.toml and run the command "python -m robotpy sync". 
 
-# Design
-You can find the diagram for the intake state machine [here](stateMachines/testIntakeDiagram.md)
-
-It is in a working state so don't judge it too hard or something
-
 # Hardware for the Robot
 
 ## roboRio (Gray box)
@@ -157,3 +152,10 @@ There is a /home/lvuser/deploy.json file which at the time of this writing (2023
   "git-branch": "fix-recal-nbeasley"
 }
 ```
+
+# State Machine Design
+
+## Intake/Shooter State Machine
+The diagram for the intake state machine [here](stateMachines/testIntakeDiagram.md)
+
+This state machine coordinates note handoffs between seperate intake/shooter state machines. Both machines run indepentenly until overriden by "master" machine.

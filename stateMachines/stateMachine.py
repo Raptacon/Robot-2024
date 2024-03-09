@@ -59,7 +59,12 @@ class StateMachine():
     
     def transitionToState(self, state:str) -> bool:
         """
-        Transition to the given state.
+        Transition to the given state, ignoring any cannotInterupt warnings
+
+        Returns:
+            True -> Transition success
+
+            False -> Transition failed or the new state's enter function failed
         """
         for _state in self.states:
             if _state.name == state:
@@ -80,9 +85,9 @@ class StateMachine():
 
         return False
     
-    def containsState(self, state:str):
+    def containsState(self, state:str)->bool:
         """
-        Check if a state with the given name exists
+        Returns if a state with the given name exists in the current machine.
         """
         for _state in self.states:
             if _state.name == state:
@@ -91,7 +96,7 @@ class StateMachine():
     
     def reset(self):
         """
-        Reset the state to the root (transitions to whatever state[0] was if not defined)
+        Reset the state to the root.
         """
         if self.debugMode: self.say("Resetting machine to root state.\n")
         self.currentState = self.rootState
@@ -99,6 +104,8 @@ class StateMachine():
     def enable(self):
         """
         Enable the machine. This must be called after creating a machine.
+
+        Calling this restores whatever state was cached on disable.
         """
         if self.isActive == False:
             self.isActive = True
@@ -111,7 +118,9 @@ class StateMachine():
     
     def disable(self):
         """
-        Disable the machine
+        Disable the machine and cache the state.
+
+        Cached state is restored on enable()
         """
         if self.isActive == True:
             self.isActive = False
@@ -157,7 +166,7 @@ class StateMachine():
     @property
     def state(self):
         """
-        Current state of machine
+        Returns current state of machine
         """
         if self.currentState != None:
             return self.currentState

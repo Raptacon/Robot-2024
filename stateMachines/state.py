@@ -24,18 +24,30 @@ class State():
         return self.name
     
     def enter(self):
+        """
+        Call onEnter function
+        """
         if not self.onEnter: return
         self.onEnter()
     
     def exit(self):
+        """
+        Call onExit function
+        """
         if not self.onExit: return
         self.onExit()
     
     def run(self):
+        """
+        Call onRun function
+        """
         if self.onRun == None: return
         self.onRun()
      
     def getTransition(self) -> str:
+        """
+        Get string key for new state.
+        """
         if self.onTransition == None:
             return ""
         else: 
