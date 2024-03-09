@@ -151,6 +151,7 @@ class ShooterPivot(commands2.PIDSubsystem):
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
+        print(self.getMeasurement(), self.isEnabled())
         if self.getMeasurement() < 0.008 and not self.isEnabled():
             #TODO add function to turn off when close enough
             print("limited")
