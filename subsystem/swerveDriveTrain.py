@@ -32,9 +32,9 @@ class Drivetrain(commands2.SubsystemBase):
             {"name": "rearRight", "channel": 59, "encoderCal": 0.0, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": True }
     ]
     kToBeModuleProps = [
-            {"name": "frontLeft", "channel": 50, "encoderCal": 32.168, "trackbase": kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": True,  },
+            {"name": "frontLeft", "channel": 50, "encoderCal": 32.168, "trackbase": kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False,  },
             {"name": "frontRight", "channel": 53, "encoderCal": 335.039, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": kWheelBaseMeters/2.0, "inverted": False },
-            {"name": "rearLeft", "channel": 56, "encoderCal": 333.984, "trackbase": kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": True },
+            {"name": "rearLeft", "channel": 56, "encoderCal": 333.984, "trackbase": kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": False },
             {"name": "rearRight", "channel": 59, "encoderCal": 212.080, "trackbase": -kTrackBaseMeters/2.0, "wheelbase": -kWheelBaseMeters/2.0, "inverted": False  }
     ]
 
