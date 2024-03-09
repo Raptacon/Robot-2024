@@ -1,7 +1,7 @@
 class State():
     #enter, run, transition should prob be callables just so that its expicit in its type
     #but also screw that cause idk what a callable is
-    def __init__(self, name:str, enter=None, run=None, transition=None, cannotInterupt=False) -> None:
+    def __init__(self, name:str, enter=None, run=None, transition=None, exit=None, cannotInterupt=False) -> None:
         """
         State to be used with a finite state machine
 
@@ -16,6 +16,7 @@ class State():
         self.onEnter = enter
         self.onRun = run
         self.onTransition = transition
+        self.onExit = exit
 
         self.cannotInterupt = cannotInterupt
 
@@ -25,6 +26,10 @@ class State():
     def enter(self):
         if not self.onEnter: return
         self.onEnter()
+    
+    def exit(self):
+        if not self.onExit: return
+        self.onExit()
     
     def run(self):
         if self.onRun == None: return

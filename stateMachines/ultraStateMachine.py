@@ -29,7 +29,7 @@ class UltraStateMachine(StateMachine):
         #At this point, the master machine shouldn't care what happens
         handoff = State(
             name="Handoff",
-            enter=lambda: self.initHandoff(),
+            enter=lambda: self.runHandoff(),
             transition=lambda: "Run"
         )
         states.append(handoff)
@@ -40,17 +40,19 @@ class UltraStateMachine(StateMachine):
         #master machine ALWAYS runs these two machines
         self.intakeSM.run()
         self.shooterSM.run()
+
+        print(f"{self.intakeSM.state} | {self.shooterSM.state}")
         return super().run()
     
     #standard run
     #check for intake machine being in the raise state to prep handoff
     def runMachines(self):
-        if str(self.intakeSM.state) == "Raise" and str(self.shooterSM.state) == "Standby":
-            self.setState("PrepHandoff")
-
+        if str(self.intakeSM.state) == "Wait" and str(self.shooterSM.state) == "Standby":
+            self.overrideState("PrepHandoff")
+    
     def beginPrepHandoff(self):
-        self.shooterSM.setState("Test")
-
-    def initHandoff(self):
-        self.intakeSM.setState("Handoff")
-        self.shooterSM.setState("Handoff")
+        self.shooterSM.overrideState("Lower")
+    
+    def runHandoff(self):
+        self.intakeSM.overrideState("Handoff")
+        self.shooterSM.overrideState("Handoff")

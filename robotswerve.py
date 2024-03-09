@@ -20,13 +20,13 @@ from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyShooterPivot import ShooterPivot
 
 from subsystem.sparkyLeds import Leds
-from stateMachines.ultraStateMachine import UltraStateMachine
 
 from commands.defaultdrive import DefaultDrive
 from commands.togglefielddrive import ToggleFieldDrive
 from commands.resetfielddrive import ResetFieldDrive
 
 from auto import SparkyShoot
+from stateMachines.testIntake import TestIntakeStateMachine
 
 
 from wpilib import CameraServer
@@ -67,7 +67,8 @@ class RobotSwerve:
         self.rotLimiter = wpimath.filter.SlewRateLimiter(3)
 
         self.leds = Leds()
-        self.intakeSM = UltraStateMachine(debugMode=True)
+
+        self.intakeSM = TestIntakeStateMachine(debugMode=True, intake=self.intake, pivot=self.intakePivotController)
 
         commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
@@ -130,7 +131,7 @@ class RobotSwerve:
             lambda: self.mechController.getRightBumper(),
             lambda: self.mechController.getAButtonPressed(),
         ))
-
+        
         self.shooter.setDefaultCommand(ShooterCommand(
             self.shooter,
             self.shooterPivot,
@@ -188,7 +189,7 @@ class RobotSwerve:
         wheelSpeed #"use" value
         self.driveTrain.getCurrentAngles()
         global lastDeg
-
+        
         #self.driveTrain.drive(-1 * LeftY * self.MaxMps, LeftX * self.MaxMps, RightX * self.RotationRate, False)
         match self.testChooser.getSelected():
             case "Drive Disable":

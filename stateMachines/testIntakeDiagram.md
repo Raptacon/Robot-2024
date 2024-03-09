@@ -6,7 +6,6 @@ flowchart BT
     mHandoff(Handoff)
 
     mRoot-->mRun
-    mRun-->mHandoff
     mHandoff-->mRun
 
     subgraph Shooter

@@ -1,11 +1,16 @@
 from stateMachines.stateMachine import *
 import wpilib
+from subsystem.sparkyShooter import Shooter
+from subsystem.sparkyShooterPivot import ShooterPivot
+
 
 class TestShooterStateMachine(StateMachine):
-    def __init__(self, states=None, initialState=None, debugMode=False, ultraMachine=None):
-        
+    def __init__(self, debugMode=False, shooter:Shooter=None, shooterPivot:ShooterPivot=None):
         self.debugTimer = wpilib.Timer()
         self.debugTimer.start()
+
+        self.shooter = shooter
+        self.shooterPivot = shooterPivot
 
         states = []
         
@@ -14,35 +19,40 @@ class TestShooterStateMachine(StateMachine):
         )
         states.append(standby)
 
-        test = State(
-            name="Test",
+        lower = State(
+            name="Lower",
             enter=lambda: self.debugTimer.reset(),
-            cannotInterupt=True,
-            transition=lambda: "Wait" if self.debugTimer.advanceIfElapsed(2) else ""
+            run=lambda: self.shooterPivot.setLoading(),
+            transition=lambda: "Wait" if self.shooterPivot.getController().getPositionError() < 0.1 else "" #idk if this will work
         )
-        states.append(test)
+        states.append(lower)
 
         wait = State(
             name="Wait"
+            #in real code, this would have some emergency exit transition.
         )
         states.append(wait)
 
         handoff = State(
             name = "Handoff",
-            transition=lambda: "PrepFire"
+            run=lambda: self.shooter.runIntake(0.4),
+            transition=lambda: "PrepFire" if self.debugTimer.advanceIfElapsed(0.5) else ""
         )
         states.append(handoff)
 
         prepFire = State(
             name="PrepFire",
-            transition=lambda: "Fire"
+            run=lambda: self.shooterPivot.setAmp(),
+            transition=lambda: "Fire" if self.shooterPivot.getController().getPositionError() < 0.1 else "" #constant from set amp
         )
         states.append(prepFire)
 
         fire = State(
             name="Fire",
-            transition=lambda: "Standby"
+            enter=lambda: self.shooter.runShooters(3),
+            transition=lambda: "Standby" if self.debugTimer.advanceIfElapsed(1) else "",
+            exit=lambda: self.shooter.runShooters(0)
         )
         states.append(fire)
         
-        super().__init__(states, initialState, debugMode)
+        super().__init__(states, None, debugMode)

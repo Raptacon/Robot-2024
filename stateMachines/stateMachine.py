@@ -3,7 +3,7 @@ from stateMachines.state import State
 class StateMachine():
     def __init__(self, states=None, initialState=None, debugMode=False):
         """
-        Finite state machine that uses string-state dictionaries
+        Finite state machine using string keys.
 
         Args:
             States : a list of states
@@ -47,7 +47,7 @@ class StateMachine():
         #evaluate transition of state
         newState = self.currentState.getTransition()
         if len(newState) != 0:
-            setStateStatus = self.setState(newState)
+            setStateStatus = self.transitionToState(newState)
             if not setStateStatus:
                 #force a reset if status returns false
                 self.say(f"ERROR! Transition from {self.currentState} to {newState} cannot be found. Check that the state is correctly added or named!")
@@ -56,21 +56,23 @@ class StateMachine():
             return setStateStatus
 
         return True
-        
-    def setState(self, state:str) -> bool:
+    
+    def transitionToState(self, state:str) -> bool:
         """
-        Set the current state in the machine. Does not care about whether it is interuptable
+        Transition to the given state.
         """
         for _state in self.states:
             if _state.name == state:
-                if self.debugMode: self.say(f"State changed to {_state}")
+                self.currentState.exit()
+
                 self.currentState = _state
+                if self.debugMode: self.say(f"State changed to {_state}")
                 
                 try:
                     self.currentState.enter()
                 except Exception:
                     #return true so we just get the on enter fail
-                    self.say(f"ERROR! On enter in {_state} failed.")
+                    print(f"ERROR! On enter in {_state} failed.")
                     self.reset()
                     return True
 
@@ -103,7 +105,7 @@ class StateMachine():
         
             #i hate this
             if self.lastState != None:
-                self.setState(str(self.lastState))
+                self.transitionToState(str(self.lastState))
                 if self.debugMode: self.say(f"Restoring state {self.lastState}\n")
                 self.lastState = None
     
@@ -126,8 +128,6 @@ class StateMachine():
         else:
             self.say("Please pass a State() object")
     
-    #this is probably a dumb name.
-    #will come up with something better later
     def overrideState(self, state):
         """
         Force a transition to this state
@@ -146,7 +146,7 @@ class StateMachine():
             return
         
         self.say(f"Forcing transition to {state}.")
-        self.setState(state)
+        self.transitionToState(state)
     
     def say(self, message:str):
         """
