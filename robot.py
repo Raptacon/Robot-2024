@@ -10,7 +10,8 @@ class MyRobot(commands2.TimedCommandRobot):
     """
     Our default robot class, pass it to wpilib.run
     Command v2 robots are encouraged to inherit from TimedCommandRobot, which
-    has an implementation of robotPeriodic which runs the scheduler for you
+    has an implementation of (self) -> None:
+    which runs the scheduler for you
     """
     #50 ms default period
     kDefaultPeriod: typing.ClassVar[float] = 50.0
@@ -30,6 +31,9 @@ class MyRobot(commands2.TimedCommandRobot):
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         self.container = RobotSwerve()
+
+    def robotPeriodic(self) -> None:
+        self.container.robotPeriodic()
 
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
