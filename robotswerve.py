@@ -10,15 +10,6 @@ import commands2.button
 
 from subsystem.swerveDriveTrain import Drivetrain
 
-from commands.shortyIntake import Intake
-from subsystem.sparkyIntake import SparkyIntake
-from subsystem.sparkyIntakePivot import IntakePivot
-from subsystem.sparkyIntakePivotController import pivotController
-
-from commands.shortyShooter import ShooterCommand
-from subsystem.sparkyShooter import Shooter
-from subsystem.sparkyShooterPivot import ShooterPivot
-
 from subsystem.sparkyLeds import Leds
 
 from commands.defaultdrive import DefaultDrive
@@ -45,14 +36,14 @@ class RobotSwerve:
 
         self.driveTrain = Drivetrain()
 
-        self.intake = SparkyIntake()
-        self.pivot = IntakePivot()
-        self.intakePivotController = pivotController()
-        self.intakePivotController.setIntakeRotationSubsystem(self.pivot)
+        # self.intake = SparkyIntake()
+        # self.pivot = IntakePivot()
+        # self.intakePivotController = pivotController()
+        # self.intakePivotController.setIntakeRotationSubsystem(self.pivot)
 
-        self.shooter = Shooter()
-        self.shooterPivot = ShooterPivot()
-        self.intakePivotController.calibrate()
+        # self.shooter = Shooter()
+        # self.shooterPivot = ShooterPivot()
+        # self.intakePivotController.calibrate()
         #self.driveController = wpilib.XboxController(0)
 
         self.xLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -99,7 +90,8 @@ class RobotSwerve:
             self.autonomousCommand.schedule()
 
     def getAutonomousCommand(self):
-        return SparkyShoot(self.shooter, self.intake, self.driveTrain)
+        #return SparkyShoot(self.shooter, self.intake, self.driveTrain)
+        pass
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
@@ -115,25 +107,25 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
             lambda: self.driveTrain.getFieldDriveRelative()
         ))
-        self.intake.setDefaultCommand(Intake(
-            self.intake,
-            self.intakePivotController,
-            lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getAButtonPressed(),
-        ))
+        # self.intake.setDefaultCommand(Intake(
+        #     self.intake,
+        #     self.intakePivotController,
+        #     lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
+        #     lambda: self.mechController.getRightBumper(),
+        #     lambda: self.mechController.getAButtonPressed(),
+        # ))
 
-        self.shooter.setDefaultCommand(ShooterCommand(
-            self.shooter,
-            self.shooterPivot,
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getBButton(),
-            lambda: self.mechController.getRightTriggerAxis(),
-            self.mechController.getYButtonPressed,
-            self.mechController.getXButton,
-            self.mechController.getLeftBumper,
-            self.mechController.getLeftY
-        ))
+        # self.shooter.setDefaultCommand(ShooterCommand(
+        #     self.shooter,
+        #     self.shooterPivot,
+        #     lambda: self.mechController.getRightBumper(),
+        #     lambda: self.mechController.getBButton(),
+        #     lambda: self.mechController.getRightTriggerAxis(),
+        #     self.mechController.getYButtonPressed,
+        #     self.mechController.getXButton,
+        #     self.mechController.getLeftBumper,
+        #     self.mechController.getLeftY
+        # ))
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
@@ -196,17 +188,6 @@ class RobotSwerve:
                 self.driveTrain.calWheels(False)
             case "Wheel Pos":
                 self.driveTrain.setSteer(wheelAngle)
-            case "Pivot Rot":
-                self.intakePivotController.setManipulator(pivotAngle)
-            case "Shoot Piviot Zero":
-                self.shooterPivot.zeroPivot(0.2)
-            case "Shoot Piviot Reverse":
-                self.shooterPivot.maxPivot(0.2)
-            case "Shoot Piviot Pos":
-                self.shooterPivot.enable()
-                self.shooterPivot.setSetpoint(pivotAngle)
-                self.shooterPivot.periodic()
-                pass
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
