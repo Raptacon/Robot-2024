@@ -23,7 +23,7 @@ class DrivePoseEstimator():
         self.kinematics = drive.getKinematics()
 
         self.cams = [
-            WrapperedPhotonCamera("ShooterAim", self.CamPos),
+            WrapperedPhotonCamera("Arducam", self.CamPos),
         ]
         self.camTargetsVisible = False
 
