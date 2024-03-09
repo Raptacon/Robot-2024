@@ -121,8 +121,6 @@ breadboxBot.yml or greenBot.yml etc
 ```powershell
 echo breadboxBot.yml > ~/robotConfig
 ```
-=======
-
 
 # Enable Power shell
 Power shell does not allow sccripts on windows now by default
@@ -130,8 +128,26 @@ Power shell does not allow sccripts on windows now by default
 * run power shell as admin
 * run `set-executionpolicy remotesigned`
 * Select A when prompted
->>>>>>> ad7e0ef862389d91723a336a9e63fe0e7932085f
 
+# Telemetry
+Telemetry is recording real-time time data and being able to record it back.
+
+Right now, our telemetry is able to reccord 2 seperate controllers, field positions, and some drive train things(velocity, steer degree, and drive percent)
+
+for viewing the logs, we use AdvantageScope. 
+
+How to download: Go to https://github.com/Mechanical-Advantage/AdvantageScope/releases/tag/v3.0.1 and download the correct version for your device.
+
+How to run: 
+
+1. open AdvantageScope
+2. click file -> open
+3. find the log you want to open in the file explorer(you may want to sort by recent if that is not already the default you have)
+
+Extra things:
+* There are multiple tabs you can open in AdvantageScope, the ones you will use the most are going to be: Line Graph, Table, and Joysticks(if you are in live time).
+
+* Delete the logs after you use them.
 # Information
 
 ## Deployed Robot Version
