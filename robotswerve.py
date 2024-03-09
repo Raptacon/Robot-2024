@@ -44,11 +44,10 @@ class RobotSwerve:
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.mechController = wpilib.XboxController(kMechControllerIdx)
 
-        #delete this maybe?
-        #idk you are you
-        if self.driveController.isConnected() == False or self.mechController.isConnected() == False:
-            print("\n\n\nCONTROLLER NOT CONNECTED!\n\n\nRED ALERT RED ALRET\n\n\n")
-            wpilib.DriverStation.silenceJoystickConnectionWarning(True)
+        if self.driveController.isConnected() == False:
+            print("\n\n\nWARNING! DRIVER CONTROLLER IS NOT CONNECTED!\n\n\n")
+        elif self.mechController.isConnected() == False:
+            print("\n\n\WARNING! MECH CONTROLLER IS NOT CONNECTED!\n\n\n")
 
         self.driveTrain = Drivetrain()
 
@@ -92,7 +91,7 @@ class RobotSwerve:
         wpilib.SmartDashboard.putString(
             "Deploy User", self.getDeployInfo("deploy-user")
         )
-
+    
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
         pass

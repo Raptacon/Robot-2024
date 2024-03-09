@@ -15,8 +15,11 @@ STANDBY_TIME = 4
 #stateMachines\testIntakeDiagram.md
 class TestIntakeStateMachine(StateMachine):
     #don't need to include all args because this state machine is predefined in its states/init state
-    def __init__(self, debugMode=False, intake:SparkyIntake=None, pivot:pivotController=None):
+    def __init__(self, intake:SparkyIntake, pivot:pivotController, debugMode=False):
         #init some variables
+        if intake == None or pivot == None:
+            raise Exception("Intake state machine intake and pivot references not given.")
+        
         self.intake = intake
         self.pivotController = pivot
         
@@ -97,68 +100,72 @@ class TestIntakeStateMachine(StateMachine):
         # )
         # states.append(handoff)
         
-        #real version
-        # idle = State(
-        #     name="Idle",
-        #     transition=lambda: "Lower"
-        # )
-        # states.append(idle)
+        # real version
+        idle = State(
+            name="Idle",
+            transition=lambda: "Lower"
+        )
+        states.append(idle)
 
-        # #lower intake for prep
-        # lower = State(
-        #     name="Lower",
-        #     enter=lambda: getPivotInstantCommand(self.pivotController, lambda: self.pivotController.setGroundPickup()),
-        #     transition=lambda: "Standby" if self.pivotController.isPivotPositioned() else ""
-        # )
-        # states.append(lower)
+        #lower intake for prep
+        lower = State(
+            name="Lower",
+            enter=lambda: getPivotInstantCommand(self.pivotController, lambda: self.pivotController.setGroundPickup()),
+            transition=lambda: "Standby" if self.pivotController.isPivotPositioned() else ""
+        )
+        states.append(lower)
 
-        # #wait until properly aligned
-        # standby = State(
-        #     name="Standby",
-        #     transition=lambda: "Intake"
-        # )
-        # states.append(standby)
+        #wait until properly aligned
+        standby = State(
+            name="Standby",
+            transition=lambda: "Intake"
+        )
+        states.append(standby)
 
-        # #try to intake note
-        # intake = State(
-        #     name="Intake",
-        #     enter=lambda: self.debugTimer.reset(),
-        #     run=lambda: self.intake.runIntake(0.4),
-        #     transition=lambda: "Raise" if self.debugTimer.advanceIfElapsed(0.25) else "",
-        #     exit=lambda: self.intake.runIntake(0)
-        # )
-        # states.append(intake)
+        #try to intake note
+        intake = State(
+            name="Intake",
+            enter=lambda: self.debugTimer.reset(),
+            run=lambda: self.intake.runIntake(0.4),
+            transition=lambda: "Raise" if self.debugTimer.advanceIfElapsed(0.25) else "",
+            exit=lambda: self.intake.runIntake(0),
+            cannotInterupt=True
+        )
+        states.append(intake)
+        
+        #eject if something is wrong
+        eject = State(
+            name="Eject",
+            enter=lambda: self.intake.runIntake(-0.4),
+            transition=lambda: "Idle" if self.debugTimer.advanceIfElapsed(1) else "",
+            exit=lambda: self.intake.runIntake(0),
+            cannotInterupt=True
+        )
+        states.append(eject)
 
-        # #eject if something is wrong
-        # eject = State(
-        #     name="Eject",
-        #     enter=lambda: self.debugTimer.reset(),
-        #     transition=lambda: "Idle" if self.debugTimer.advanceIfElapsed(1) else ""
-        # )
-        # states.append(eject)
+        #raise to handoff position
+        #this is when the master machine would tell the shooter
+        raiseIntake = State(
+            name="Raise",
+            enter=lambda: getPivotInstantCommand(self.pivotController, lambda: self.pivotController.setHandOffPickup()),
+            transition=lambda: "Wait" if self.pivotController.isPivotPositioned() else ""
+        )
+        states.append(raiseIntake)
 
-        # #raise to handoff position
-        # #this is when the master machine would tell the shooter
-        # raiseIntake = State(
-        #     name="Raise",
-        #     enter=lambda: getPivotInstantCommand(self.pivotController, lambda: self.pivotController.setHandOffPickup()),
-        #     transition=lambda: "Wait" if self.pivotController.isPivotPositioned() else ""
-        # )
-        # states.append(raiseIntake)
+        wait = State(
+            name="Wait",
+            transition=lambda: "Handoff" if self.debugTimer.advanceIfElapsed(1) else ""
+        )
+        states.append(wait)
 
-        # wait = State(
-        #     name="Wait",
-        #     transition=lambda: "Handoff" if self.debugTimer.advanceIfElapsed(1) else ""
-        # )
-        # states.append(wait)
-
-        # handoff = State(
-        #     name="Handoff",
-        #     run=lambda: self.intake.runIntake(-0.4),
-        #     exit=lambda: self.intake.runIntake(0)
-        #     #transition=lambda:"Idle" if self.debugTimer.advanceIfElapsed(0.5) else ""
-        # )
-        # states.append(handoff)
+        handoff = State(
+            name="Handoff",
+            run=lambda: self.intake.runIntake(-0.4),
+            exit=lambda: self.intake.runIntake(0),
+            cannotInterupt=True
+            #transition=lambda:"Idle" if self.debugTimer.advanceIfElapsed(0.5) else ""
+        )
+        states.append(handoff)
         
         super().__init__(states, None, debugMode)
     
