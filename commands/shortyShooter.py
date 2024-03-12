@@ -2,6 +2,7 @@ import commands2
 from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyShooterPivot import ShooterPivot
 import typing
+import math
 
 class ShooterCommand(commands2.CommandBase):
     def __init__(self,
@@ -59,13 +60,15 @@ class ShooterCommand(commands2.CommandBase):
         if(self.manualPivotControl()): #manual
             self.manualPivot = True
             self.pivot.disable()
-            self.pivot.runPivot(self.manualInput())
+            self.pivot.setMotorCurrent(self.pivot.kClimbCurrent)
+            #square the inputs to allow agradual add on.
+            self.pivot.runPivot(math.copysign(1.0, self.manualInput())*self.manualInput()**2)
         elif self.manualPivot: #cancle Manual
             self.pivot.runPivot(0)
+            self.pivot.setMotorCurrent(self.pivot.kNormalCurrent)
             self.manualPivot = False
         elif self.climbPos(): # climbing enabled
             self.climbing = True
-            self.pivot.enable()
             self.pivot.setClimb()
         elif self.climbing: # climbing canceled
             #disable on button release
