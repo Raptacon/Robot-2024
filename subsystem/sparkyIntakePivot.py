@@ -20,7 +20,7 @@ class IntakePivot(commands2.PIDSubsystem):
         self.encoderOffset = 0.551
 
         self.pidController = wpimath.controller.PIDController(5, 0, 0)
-        self.pidController.setTolerance(0.1)
+        self.pidController.setTolerance(0.2)
         super().__init__(self.pidController, 0)
 
         self.motorFeedforward = wpimath.controller.SimpleMotorFeedforwardMeters(0, 0, 0)
@@ -47,9 +47,8 @@ class IntakePivot(commands2.PIDSubsystem):
 
         currDeg = (math.degrees(absPos))
         wpilib.SmartDashboard.putNumber("Intake Angle Degrees", currDeg)
-
         return absPos
-    
+
     def getAbsolutePosition(self):
         #print(f"absPos:{self.encoder.getAbsolutePosition()}")
         return self.encoder.getAbsolutePosition()
@@ -79,6 +78,6 @@ class IntakePivot(commands2.PIDSubsystem):
 
     def setIntakePivot(self, percent : float):
         self.pivotMotor.set(percent)
-    
+
     def getLimit(self):
         return self.handOffSwitch.get()

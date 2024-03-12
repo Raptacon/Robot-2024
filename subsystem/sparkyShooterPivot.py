@@ -7,6 +7,8 @@ import utils.sparkMaxUtils
 class ShooterPivot(commands2.PIDSubsystem):
     normalPid = {"Kp": 72, "Ki": 0, "Kd": 0}
     climbPid = {"Kp": 72*4, "Ki": 0, "Kd": 0}
+    kClimbCurrent = 50
+    kNormalCurrent = 20
     def __init__(self) -> None:
         pidController = wpimath.controller.PIDController(**self.normalPid)
         pidController.setTolerance(0.1)
@@ -41,6 +43,8 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.reverseLimit = self.pivotMotorRight.getReverseLimitSwitch(rev.SparkMaxLimitSwitch.Type.kNormallyClosed)
 
         self.motorFeedforward = wpimath.controller.SimpleMotorFeedforwardMeters(0, 0, 0)
+        self.motorCurrent = None
+        self.setMotorCurrent(self.kNormalCurrent)
 
         #setup default values
         self.zeroed = False
@@ -66,8 +70,12 @@ class ShooterPivot(commands2.PIDSubsystem):
 
         elif not self.coasting:
             self.coasting = True
-            self.pivotMotorRight.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
-            self.pivotMotorLeft.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
+            #self.pivotMotorRight.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
+            #self.pivotMotorLeft.setIdleMode(rev.CANSparkBase.IdleMode.kCoast)
+
+        wpilib.SmartDashboard.putNumber("Left Climb Current", self.pivotMotorLeft.getOutputCurrent())
+        wpilib.SmartDashboard.putNumber("Right Climb Current", self.pivotMotorRight.getOutputCurrent())
+
 
 
 
@@ -135,7 +143,7 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.setSoftLimitForward(0.00)
 
         self.enable()
-        #self.pivotMotorRight.setSmartCurrentLimit(20)
+        self.setMotorCurrent(self.kNormalCurrent)
         self.setSetpoint(0)
 
     #sets amp angle
@@ -146,24 +154,24 @@ class ShooterPivot(commands2.PIDSubsystem):
             self.setSoftLimitForward(0.0)
 
         self.enable()
-        #self.pivotMotorRight.setSmartCurrentLimit(20)
+        self.setMotorCurrent(self.kNormalCurrent)
+
         self.setSetpoint(0.4)
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
-        print(self.getMeasurement(), self.isEnabled())
         if self.getMeasurement() < 0.008 and not self.isEnabled():
             #TODO add function to turn off when close enough
             print("limited")
         elif self.isEnabled():
             #climbing we need increased current, we will not use PID since we need a strong quick pull
             # and a soft limit will be used to disable output
-            #self.pivotMotorRight.setSmartCurrentLimit(60)
             self.disable()
-            #self.pivotMotorRight.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, -0.045)
-            #first round allow settings to update
-            #return
-        self.runPivot(0.8)
+            if self.setMotorCurrent(self.kNormalCurrent):
+                return
+
+        self.runPivot(0.4)
+
 
     def setMotor(self, percent: float):
         self.pivotMotorLeft.set(percent)
@@ -172,3 +180,18 @@ class ShooterPivot(commands2.PIDSubsystem):
     def setSoftLimitForward(self, limit: float):
         self.pivotMotorRight.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
         self.pivotMotorLeft.setSoftLimit(rev.CANSparkMax.SoftLimitDirection.kForward, 0.00)
+
+    def setMotorCurrent(self, current: int):
+        #set to override to one current limit
+        #current = int(50.0)
+        current = int(current)
+        if(self.motorCurrent == current):
+            return False
+
+        wpilib.SmartDashboard.putNumber("Shoot Pivot Current", current)
+        self.motorCurrent = current
+
+        self.pivotMotorLeft.setSmartCurrentLimit(current)
+        self.pivotMotorRight.setSmartCurrentLimit(current)
+        return True
+
