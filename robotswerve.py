@@ -30,6 +30,8 @@ from auto import SparkyShoot
 
 
 from wpilib import CameraServer
+
+from utils.breakBeamFactory import createBreakBeam
 kDriveControllerIdx = 0
 kMechControllerIdx = 1
 lastDeg =0
@@ -164,13 +166,16 @@ class RobotSwerve:
                  "Shooter Cal",
                  "Shoot Piviot Zero",
                  "Shoot Piviot Reverse",
-                 "Shoot Piviot Pos"]
+                 "Shoot Piviot Pos",
+                 "Break Beam"
+                 ]
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         #commands2.CommandScheduler.getInstance().cancelAll()
         self.calEn = False
         self.calDis = False
+        self.breakbeam = None
         self.testChooser = wpilib.SendableChooser()
         for i in self.testModes:
             self.testChooser.addOption(i, i)
@@ -180,6 +185,7 @@ class RobotSwerve:
         wpilib.SmartDashboard.putNumber("Wheel Speed", 0)
         wpilib.SmartDashboard.putNumber("Pivot Angle:", 0.5)
         wpilib.SmartDashboard.putNumber("Shooter Angle:", 310)
+        wpilib.SmartDashboard.putBoolean("Break Beam", False)
 
 
     def testPeriodic(self) -> None:
@@ -222,6 +228,12 @@ class RobotSwerve:
                 self.shooterPivot.setSetpoint(pivotAngle)
                 self.shooterPivot.periodic()
                 pass
+            case "Break Beam":
+                if(self.breakbeam == None):
+                    self.breakbeam = createBreakBeam(0) # This creates a break beam on the DIO port 0
+                else:
+                    print(self.breakbeam)
+                    wpilib.SmartDashboard.putBoolean("Break Beam", self.breakbeam.get())
             case _:
                 print(f"Unknown {self.testChooser.getSelected()}")
 
