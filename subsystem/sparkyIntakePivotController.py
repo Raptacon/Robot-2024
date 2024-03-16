@@ -65,9 +65,10 @@ class pivotController(commands2.SubsystemBase):
         """
         sets the manipulator to the handoff position
         """
-        self.setManipulator(0)
+        #Using 2.0 instead of 0 as this limits the landing and less rebound
+        self.setManipulator(2)
 
-def getPivotFunctionalCommand(pivotController: pivotController, func: Callable, tolerance = 0.1):
+def getPivotFunctionalCommand(pivotController: pivotController, func: Callable, tolerance = 0.2):
     """
     Creates a functional command for the pivot
     Args:
@@ -84,7 +85,7 @@ def getPivotFunctionalCommand(pivotController: pivotController, func: Callable, 
     cmd.addRequirements(pivotController.getReqSubsystems())
     return cmd
 
-def getPivotInstantCommand(pivotController: pivotController, func: Callable, tolerance = 0.1):
+def getPivotInstantCommand(pivotController: pivotController, func: Callable, tolerance = 0.2):
     """
     Creates a functional command for the pivot
     Args:
