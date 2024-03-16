@@ -65,7 +65,7 @@ class RobotSwerve:
 
         self.leds = Leds()
 
-        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
         CameraServer.launch()
 
