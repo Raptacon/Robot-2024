@@ -206,7 +206,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
                 f"Failed to configure Drive Motor on id {self.driveId}. Error {status}"
             )
         self.driveMotor.enableVoltageCompensation(12.0)
-        self.driveMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
+        self.driveMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
@@ -239,6 +239,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         self.steerMotor = rev.CANSparkMax(
             self.steerId, rev.CANSparkLowLevel.MotorType.kBrushless
         )
+        self.steerMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
 
         utils.sparkMaxUtils.configureSparkMaxCanRates(self.steerMotor)
         self.steerEncoder = self.encoder
