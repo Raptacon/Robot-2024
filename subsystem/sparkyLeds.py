@@ -12,13 +12,13 @@ class Leds(commands2.Subsystem):
         #9 LED frontRight 9 LED frontRight
         self.strips = {}
         #Right Front - first 9 in order
-        self.strips["frontRight"]= Strip(self.ledData[0:9], "fr")
+        self.strips["frontRight"]= Strip(self.ledData[0:9], "frontRight")
         #Right Read- 2nd 9 in reverse order
-        self.strips["rearRight"]= Strip(self.ledData[9:18][::-1], "rr")
+        self.strips["rearRight"]= Strip(self.ledData[9:18][::-1], "rearRight")
         #Left 3rd set of 9 in order
-        self.strips["rearLeft"] = Strip(self.ledData[18:27], "rl")
+        self.strips["rearLeft"] = Strip(self.ledData[18:27], "rearLeft")
         #Left 4th set of 9 reverse order
-        self.strips["frontLeft"] = Strip(self.ledData[27:36][::-1], "fl")
+        self.strips["frontLeft"] = Strip(self.ledData[27:36][::-1], "frontLeft")
         self.strips["frontRight"].setTeamColor()
         self.strips["frontLeft"].setTeamColor()
         self.strips["rearLeft"].setRainbowHue()
