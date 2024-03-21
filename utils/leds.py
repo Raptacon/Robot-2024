@@ -12,14 +12,16 @@ class Mode(Enum):
 
 class Strip():
     def __init__(self, strip: list[wpilib.AddressableLED.LEDData],
+                 name: str,
                  mode: Mode = Mode.RAINBOWBRIGHT,
                  hsv: list[int, int, int] = [243, 255, 128],
                  rgbP: list[int, int, int] = [0, 255, 0],
                  rgbS: list[int,int,int] = [255,255,255]):
         self.strip = strip
-        self.hsv = hsv
-        self.rgbPrimary = rgbP
-        self.rgbSecondary = rgbS
+        self.name = name
+        self.hsv = hsv[:]
+        self.rgbPrimary = rgbP[:]
+        self.rgbSecondary = rgbS[:]
         self.mode = mode
 
         self.ledPeriodicRate = 1.0

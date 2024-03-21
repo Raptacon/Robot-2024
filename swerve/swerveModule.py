@@ -210,9 +210,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
         # Inversion should come on a motor by motor basis
         # self.driveMotor.setInverted(self.consts.getDriveInverted())
-        self.driveEncoder = self.driveMotor.getEncoder(
-            rev.SparkRelativeEncoder.Type.kHallSensor
-        )
+        self.driveEncoder = self.driveMotor.getEncoder()
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(
             self.driveSensorPositionCoefficient
