@@ -14,7 +14,7 @@ class IntakePivot(commands2.PIDSubsystem):
         self.pivotMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
         self.pivotMotor.setInverted(False)
 
-        self.pivotRelEncoder = self.pivotMotor.getEncoder(rev.SparkRelativeEncoder.Type.kHallSensor)
+        self.pivotRelEncoder = self.pivotMotor.getEncoder()
 
         self.encoder = wpilib.DutyCycleEncoder(0)
         self.encoderOffset = 0.551
