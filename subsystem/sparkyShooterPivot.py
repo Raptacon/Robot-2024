@@ -76,9 +76,6 @@ class ShooterPivot(commands2.PIDSubsystem):
         wpilib.SmartDashboard.putNumber("Left Climb Current", self.pivotMotorLeft.getOutputCurrent())
         wpilib.SmartDashboard.putNumber("Right Climb Current", self.pivotMotorRight.getOutputCurrent())
 
-
-
-
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
         #Do not use output until zeroed
@@ -156,7 +153,17 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.enable()
         self.setMotorCurrent(self.kNormalCurrent)
 
-        self.setSetpoint(0.4)
+        self.setSetpoint(0.5)
+
+    def setFerry(self):
+        if not self.isEnabled():
+            self.getController().setPID(**self.normalPid)
+            self.setSoftLimitForward(0.0)
+
+        self.enable()
+        self.setMotorCurrent(self.kNormalCurrent)
+
+        self.setSetpoint(0.13)
 
     def setClimb(self):
         #norminal goal is 0.05 for climbing postion
