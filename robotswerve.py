@@ -65,7 +65,7 @@ class RobotSwerve:
 
         self.leds = Leds()
 
-        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
         CameraServer.launch()
 
@@ -120,7 +120,11 @@ class RobotSwerve:
         """This function is called periodically during autonomous"""
 
     def teleopInit(self) -> None:
-        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        # The below line toggles field drive on a button pressed. This is being replaced
+        #  by the use of a held trigger
+        ## commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        commands2.button.JoystickButton(self.driveController, 6).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
+        commands2.button.JoystickButton(self.driveController, 6).onFalse(ToggleFieldDrive(self.driveTrain, lambda: False))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
 
         self.driveTrain.setDefaultCommand(DefaultDrive(
