@@ -31,6 +31,7 @@ class MyRobot(commands2.TimedCommandRobot):
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         self.container = RobotSwerve()
+        self.container.robotInit()
 
     def robotPeriodic(self) -> None:
         self.container.robotPeriodic()
