@@ -7,6 +7,7 @@ class Shooter(commands2.Subsystem):
         super().__init__()
         self.intakeMotor = rev.CANSparkMax(23, rev.CANSparkLowLevel.MotorType.kBrushless)
         utils.sparkMaxUtils.configureSparkMaxCanRates(self.intakeMotor)
+        self.intakeMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         self.intakeMotor.setInverted(True)
         self.leftShootMotor = rev.CANSparkMax(24, rev.CANSparkLowLevel.MotorType.kBrushless)
         utils.sparkMaxUtils.configureSparkMaxCanRates(self.leftShootMotor)

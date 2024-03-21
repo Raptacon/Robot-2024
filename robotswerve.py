@@ -149,9 +149,9 @@ class RobotSwerve:
             lambda: self.mechController.getBButton(),
             lambda: self.mechController.getRightTriggerAxis(),
             self.mechController.getYButtonPressed,
-            self.mechController.getXButton,
+            self.mechController.getXButtonPressed,
             self.mechController.getLeftBumper,
-            self.mechController.getLeftY
+            self.mechController.getLeftY,
         ))
 
     def teleopPeriodic(self) -> None:
