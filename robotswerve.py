@@ -138,6 +138,7 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
             lambda: self.mechController.getRightBumper(),
             lambda: self.mechController.getAButtonPressed(),
+            [self.driveController, self.mechController],
         ))
 
         self.shooter.setDefaultCommand(ShooterCommand(
