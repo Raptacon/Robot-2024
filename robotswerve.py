@@ -1,5 +1,4 @@
 import wpilib
-import wpilib.event
 import json
 import os
 from pathlib import Path

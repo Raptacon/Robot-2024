@@ -1,5 +1,4 @@
 import commands2
-import wpilib.event
 from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyShooterPivot import ShooterPivot
 import typing
