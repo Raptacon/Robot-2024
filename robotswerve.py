@@ -229,6 +229,9 @@ class RobotSwerve:
             break
             print(f"{m.name} {m.driveMotor.getAppliedOutput()} {m.driveMotor.get()}")
 
+    def robotInit(self):
+        pass
+
     def getDeployInfo(self, key: str) -> str:
         """Gets the Git SHA of the deployed robot by parsing ~/deploy.json and returning the git-hash from the JSON key OR if deploy.json is unavilable will return "unknown"
            example deploy.json: '{"deploy-host": "DESKTOP-80HA89O", "deploy-user": "ehsra", "deploy-date": "2023-03-02T17:54:14", "code-path": "blah", "git-hash": "3f4e89f138d9d78093bd4869e0cac9b61becd2b9", "git-desc": "3f4e89f-dirty", "git-branch": "fix-recal-nbeasley"}

@@ -9,6 +9,7 @@ class Mode(Enum):
     FLASH = 3
     STATIC = 4
     RANDOM = 5
+    TEAM = 6
 
 class Strip():
     def __init__(self, strip: list[wpilib.AddressableLED.LEDData],
@@ -19,10 +20,11 @@ class Strip():
                  rgbS: list[int,int,int] = [255,255,255]):
         self.strip = strip
         self.name = name
-        self.hsv = hsv[:]
-        self.rgbPrimary = rgbP[:]
-        self.rgbSecondary = rgbS[:]
+        self.hsv = hsv.copy()
+        self.rgbPrimary = rgbP.copy()
+        self.rgbSecondary = rgbS.copy()
         self.mode = mode
+        self.teamChase = False
 
         self.ledPeriodicRate = 1.0
         self.fadeRate = 8
@@ -41,6 +43,13 @@ class Strip():
                 blink(self.strip, self.timer, self.rateS, self.dutyCycle, self.rgbPrimary, self.rgbSecondary)
             case Mode.RANDOM:
                 randomLeds(self.strip, self.timer, self.rateS)
+            case Mode.TEAM:
+                self.setTeamColor(self.teamChase)
+                if self.teamChase:
+                    self.hsv[2] = rainbowValue(self.strip, self.hsv[0], self.hsv[1], self.hsv[2], self.fadeRate)
+                else:
+                    blink(self.strip, self.timer, self.rateS, self.dutyCycle, self.rgbPrimary, self.rgbSecondary)
+
 
 
     def getDefaultHue(self):
@@ -50,9 +59,9 @@ class Strip():
             return 360 #HSV Red
     def getDefaultRgb(self):
         if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kBlue:
-            return [0, 0, 255]
+            return [0, 0, 255].copy()
         else:
-            return [255, 0, 0]
+            return [255, 0, 0].copy()
 
     def setRainbowHue(self, startingHue: float = 0, saturation: float = 255, value: float = 128):
         self.hue = startingHue
@@ -60,39 +69,48 @@ class Strip():
         self.value = value
         self.mode = Mode.RAINBOWHUE
 
-    def setRainbowValue(self, startingHue: float = 0, saturation: float = 255, value: float = 128):
-        self.hue = startingHue
+    def setRainbowValue(self, hue: float = 0, saturation: float = 255, startingValue: float = 128):
+        self.hue = hue
         self.saturation = saturation
-        self.value = value
+        self.value = startingValue
         self.mode = Mode.RAINBOWBRIGHT
     def setBlink(self, rgb: list[int, int, int], rateS = 1.0, dutyCycle: float = 0.5):
         self.timer.reset()
         self.rateS = rateS
         self.dutyCycle = dutyCycle
-        self.rgbPrimary = rgb
+        self.rgbPrimary = rgb.copy()
         self.rgbSecondary = [0,0,0]
         self.mode = Mode.BLINK
     def setFlash(self, OnRgb: list[int, int, int], OffRgb: list[int, int, int], rateS = 1.0, dutyCycle: float = 0.5):
         self.timer.reset()
         self.rateS = rateS
         self.dutyCycle = dutyCycle
-        self.rgbPrimary = OnRgb
-        self.rgbSecondary = OffRgb
+        self.rgbPrimary = OnRgb.copy()
+        self.rgbSecondary = OffRgb.copy()
         self.mode = Mode.FLASH
     def setStatic(self, rgb: list[int,int,int]):
         self.dutyCycle = 1.0
         self.rateS = 1.0
-        self.rgbPrimary = rgb
+        self.rgbPrimary = rgb.copy()
         self.mode = Mode.STATIC
     def setRandom(self, rateS: float):
         self.dutyCycle = 1.0
         self.rateS = rateS
         self.mode = Mode.RANDOM
     def setTeamColor(self, chase = True):
-        if chase:
-            self.setRainbowValue(self.getDefaultHue(), 255, 128)
+        self.teamChase = chase
+        if self.mode == Mode.TEAM:
+            #if already team mode update the team color
+            if chase:
+                self.hsv[0] = self.getDefaultHue()
+            else:
+                self.rgbPrimary = self.getDefaultRgb()
         else:
-            self.setStatic(self.getDefaultRgb())
+            if chase:
+                self.setRainbowValue(self.getDefaultHue(), 255, 128)
+            else:
+                self.setStatic(self.getDefaultRgb())
+        self.mode = Mode.TEAM
 
 
 def rainbowHue(leds: list[wpilib.AddressableLED.LEDData], currentHue: float, saturation: float = 255, value: float = 128):
@@ -115,12 +133,13 @@ def rainbowHue(leds: list[wpilib.AddressableLED.LEDData], currentHue: float, sat
     # Check bounds
     return currentHue % 180
 
-def rainbowValue(leds: [wpilib.AddressableLED.LEDData], hue: int = 360, saturation: int = 255, startingValue: int = 0, step: float = 16):
+def rainbowValue(leds: [wpilib.AddressableLED.LEDData], hue: int = 360, saturation: int = 255, startingValue: int = 0, step: float = 32):
     """
     Pass in the LEDs array and the current hue to animate a rainbow
     The new next hue is passed out
     """
     # For every pixel
+    #print(f"raindbow value {hue} {saturation} {value}")
     for i in range(len(leds)):
         # Calculate the hue - hue is easier for rainbows because the color
         # shape is a circle so only one value needs to precess
@@ -137,8 +156,7 @@ def rainbowValue(leds: [wpilib.AddressableLED.LEDData], hue: int = 360, saturati
 
 def blink(leds: list[wpilib.AddressableLED.LEDData], timer: wpilib.Timer, rateS: float = 1.0, dutyCycle: float = 0.5, onRgb: list[int,int,int] = [0,255,0], offRgb: [int, int, int] = [0,0,0]):
     #check for rollover
-    if timer.get() > rateS:
-        timer.reset()
+    timer.advanceIfElapsed(rateS)
 
     #determine if should be on or off
     rgb = offRgb
@@ -146,10 +164,10 @@ def blink(leds: list[wpilib.AddressableLED.LEDData], timer: wpilib.Timer, rateS:
         rgb = onRgb
 
     for led in leds:
-        led.setRGB(*rgb)
+        led.setRGB(rgb[0], rgb[2], rgb[1])
 
 def randomLeds(leds: list[wpilib.AddressableLED.LEDData], timer: wpilib.Timer, rateS: float = 1.0):
-    if timer.get() < rateS:
+    if not timer.advanceIfElapsed(rateS):
         return
     timer.reset()
 
