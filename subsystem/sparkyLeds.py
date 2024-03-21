@@ -4,6 +4,7 @@ from utils.leds import Strip
 
 class Leds(commands2.Subsystem):
     kLEDBuffer = 36 #one side temp
+    strips: dict[str,Strip]
     def __init__(self):
         self.leds = wpilib.AddressableLED(0)
         self.ledData = [wpilib.AddressableLED.LEDData() for _ in range(self.kLEDBuffer)]
@@ -16,8 +17,8 @@ class Leds(commands2.Subsystem):
         #Right Read- 2nd 9 in reverse order
         self.strips["rearRight"]= Strip(self.ledData[9:18][::-1], "rearRight")
         #Left 3rd set of 9 in order
-        self.strips["rearLeft"] = Strip(self.ledData[18:27], "rearLeft")
         #Left 4th set of 9 reverse order
+        self.strips["rearLeft"] = Strip(self.ledData[18:27], "rearLeft")
         self.strips["frontLeft"] = Strip(self.ledData[27:36][::-1], "frontLeft")
         self.strips["frontRight"].setTeamColor()
         self.strips["frontLeft"].setTeamColor()
@@ -41,3 +42,8 @@ class Leds(commands2.Subsystem):
 
         # Set the LEDs
         self.leds.setData(self.ledData)
+
+    def allGreen(self, enable: bool):
+        for name,strip in self.strips.items():
+            strip.enableStatusColor([0,255,0])
+            strip.enableStatusColor(enable)

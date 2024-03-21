@@ -23,6 +23,7 @@ class Strip():
         self.rgbPrimary = rgbP[:]
         self.rgbSecondary = rgbS[:]
         self.mode = mode
+        self.statusEnable = False
 
         self.ledPeriodicRate = 1.0
         self.fadeRate = 8
@@ -33,6 +34,8 @@ class Strip():
 
     def periodic(self):
         match self.mode:
+            case self.statusEnable:
+                blink(self.strip, self.timer, self.rateS, self.dutyCycle, self.enableStatusColor, self.rgbSecondary)
             case Mode.RAINBOWHUE:
                 self.hsv[0] = rainbowHue(self.strip, self.hsv[0], self.hsv[1], self.hsv[2])
             case Mode.RAINBOWBRIGHT:
@@ -93,6 +96,10 @@ class Strip():
             self.setRainbowValue(self.getDefaultHue(), 255, 128)
         else:
             self.setStatic(self.getDefaultRgb())
+    def setStatusColor(self, OnRgb: list[int, int, int]):
+        self.statusColor = OnRgb[:]
+    def enableStatusColor(self, enable : bool):
+        self.statusEnable = enable
 
 
 def rainbowHue(leds: list[wpilib.AddressableLED.LEDData], currentHue: float, saturation: float = 255, value: float = 128):
