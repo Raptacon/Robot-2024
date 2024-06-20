@@ -31,7 +31,13 @@ class Strip():
         self.timer = wpilib.Timer()
         self.timer.start()
 
+        self.error = False
+        self.errorColor = [0,0,0]
+
     def periodic(self):
+        if self.error:
+            blink(self.strip, self.timer, 0.5, 0.5, self.errorColor0, self.errorColor1)
+
         match self.mode:
             case Mode.RAINBOWHUE:
                 self.hsv[0] = rainbowHue(self.strip, self.hsv[0], self.hsv[1], self.hsv[2])
@@ -93,6 +99,10 @@ class Strip():
             self.setRainbowValue(self.getDefaultHue(), 255, 128)
         else:
             self.setStatic(self.getDefaultRgb())
+    def setErrorMode(self, error : bool, color0 : list[wpilib.AddressableLED.LEDData] = [0,0,0], color1 : list[wpilib.AddressableLED.LEDData] = [0,0,0]):
+        self.error = error
+        self.errorColor0 = color0
+        self.errorColor1 = color1
 
 
 def rainbowHue(leds: list[wpilib.AddressableLED.LEDData], currentHue: float, saturation: float = 255, value: float = 128):
