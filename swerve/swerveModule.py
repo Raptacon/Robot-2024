@@ -458,8 +458,6 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         self.setSetpoint(speedSetpoint, angleSetpoint)
 
         return optimizedState
-
-
     
     def setSetpoint(self, speedSetpoint: float, angleSetpoint: wpimath.geometry.Rotation2d):
 
