@@ -344,7 +344,6 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         Sets the modules drive voltage and steer angle.
         Trys to prevent 180 degree turns on module if can rotate closer one direction
         """
-        print(driveVoltage)
         # convert to radians
         steerAngle = math.radians(steerAngleDeg)
         # if steerAngle < 0.0:
