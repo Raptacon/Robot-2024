@@ -257,6 +257,10 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         )  # Test Values P: 0.3, I: 1, D: 0
         self.steerPIDController.setTolerance(0.008)
 
+        #TODO find actuall values for these two variables
+        self.driveFeedforward = wpimath.controller.SimpleMotorFeedforwardMeters(0.1, 0.13)
+        self.driveFeedback = wpimath.controller.PIDController(0.05, 0.0, 0.0)
+
         status = phoenix5.ErrorCode.OK
         if status != phoenix5.ErrorCode.OK:
             raise RuntimeError(
@@ -340,6 +344,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         Sets the modules drive voltage and steer angle.
         Trys to prevent 180 degree turns on module if can rotate closer one direction
         """
+        print(driveVoltage)
         # convert to radians
         steerAngle = math.radians(steerAngleDeg)
         # if steerAngle < 0.0:
@@ -443,3 +448,28 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         else:
             # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
             pass
+
+    def runSetpoint(self, state : wpimath.kinematics.SwerveModuleState) -> wpimath.kinematics.SwerveModuleState:
+        optimizedState = wpimath.kinematics.SwerveModuleState.optimize(state, wpimath.geometry.Rotation2d(self.getSteerAngle()))
+
+        angleSetpoint = optimizedState.angle
+        speedSetpoint = optimizedState.speed_fps
+
+        self.setSetpoint(speedSetpoint, angleSetpoint)
+
+        return optimizedState
+
+
+    
+    def setSetpoint(self, speedSetpoint: float, angleSetpoint: wpimath.geometry.Rotation2d):
+
+        if (not (angleSetpoint == None)):
+            self.setSteerAngle(angleSetpoint.degrees())
+
+        if (not (speedSetpoint == None)):
+            adjustSpeedSetpoint = speedSetpoint * math.cos(self.steerPIDController.getPositionError())
+
+            velocityRadPerSec = adjustSpeedSetpoint / (self.consts.getWheelDiameter() / 2)
+            voltage = self.driveFeedforward.calculate(velocityRadPerSec) + self.driveFeedback.calculate(self.getDriveVelocity(), velocityRadPerSec)
+            print(voltage)
+            self.setDriveVoltage(voltage)

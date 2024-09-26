@@ -9,6 +9,7 @@ import wpimath
 import commands2.button
 
 from subsystem.swerveDriveTrain import Drivetrain
+from subsystem.swerveAutoDriveTrain import AutoDrivetrain
 
 from commands.shortyIntake import Intake
 from subsystem.sparkyIntake import SparkyIntake
@@ -28,6 +29,9 @@ from data.telemetry import Telemetry
 
 from auto import SparkyShoot
 
+from pathplannerlib.auto import PathPlannerAuto, NamedCommands
+from pathplannerlib.path import PathPlannerPath
+from pathplannerlib.auto import AutoBuilder
 
 from wpilib import CameraServer
 kDriveControllerIdx = 0
@@ -43,8 +47,6 @@ class RobotSwerve:
         wpilib.DriverStation.silenceJoystickConnectionWarning(True)
         self.driveController = wpilib.XboxController(kDriveControllerIdx)
         self.mechController = wpilib.XboxController(kMechControllerIdx)
-
-        self.driveTrain = Drivetrain()
 
         # Provide access to the network communication data to / from the Driver Station.
         self.driverStation = wpilib.DriverStation
@@ -65,8 +67,6 @@ class RobotSwerve:
 
         self.leds = Leds()
 
-        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
-        commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
         CameraServer.launch()
 
         # TODO - Default this to True once we like what we see with telemetry
@@ -95,6 +95,7 @@ class RobotSwerve:
         wpilib.SmartDashboard.putString(
             "Deploy User", self.getDeployInfo("deploy-user")
         )
+
     def robotPeriodic(self) -> None:
         if self.enableTelemetry and self.telemetry:
             self.telemetry.runDataCollections()
@@ -108,13 +109,15 @@ class RobotSwerve:
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
+        self.autoDriveTrain = AutoDrivetrain()
         self.autonomousCommand = self.getAutonomousCommand()
 
         if self.autonomousCommand:
             self.autonomousCommand.schedule()
 
     def getAutonomousCommand(self):
-        return SparkyShoot(self.shooter, self.intake, self.driveTrain)
+        path = PathPlannerPath.fromPathFile("Example Path")
+        return AutoBuilder.followPath(path)
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
@@ -123,6 +126,11 @@ class RobotSwerve:
         # The below line toggles field drive on a button pressed. This is being replaced
         #  by the use of a held trigger
         ## commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain))
+        self.driveTrain = Drivetrain()
+
+        commands2.button.JoystickButton(self.driveController, 1).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
+        commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))
+
         commands2.button.JoystickButton(self.driveController, 6).onTrue(ToggleFieldDrive(self.driveTrain, lambda: True))
         commands2.button.JoystickButton(self.driveController, 6).onFalse(ToggleFieldDrive(self.driveTrain, lambda: False))
         commands2.button.JoystickButton(self.driveController, 2).onTrue(ResetFieldDrive(self.driveTrain))

@@ -5,7 +5,6 @@ import commands2
 
 from robotswerve import RobotSwerve
 
-
 class MyRobot(commands2.TimedCommandRobot):
     """
     Our default robot class, pass it to wpilib.run

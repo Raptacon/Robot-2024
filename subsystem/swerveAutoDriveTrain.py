@@ -3,17 +3,23 @@ from swerve.swerveModule import SwerveModuleMk4L1SparkMaxNeoCanCoder as SwerveMo
 
 import commands2
 import wpimath.kinematics
+from wpimath.kinematics import ChassisSpeeds
 import wpimath.geometry
 from wpimath.geometry import Rotation2d
 from wpimath.geometry import Pose2d
 import math
 import wpilib
 
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
+from pathplannerlib.path import PathPlannerPath
+from pathplannerlib.commands import FollowPathHolonomic
+
 from wpilib import DriverStation
 
 import ntcore
 
-class Drivetrain(commands2.SubsystemBase):
+class AutoDrivetrain(commands2.SubsystemBase):
     kMaxVoltage = 12.0
     kWheelBaseMeters = 0.7112 # front to back distance
     kTrackBaseMeters = 0.6604 # left to right distance
@@ -53,7 +59,7 @@ class Drivetrain(commands2.SubsystemBase):
         self.table = self.datatable.getTable("Drivetrain")
         self.posTable = self.datatable.getTable("Robot position")
         assert(self.table)
-        for module in Drivetrain.kModuleProps:
+        for module in AutoDrivetrain.kModuleProps:
             name = module["name"]
             subTable = self.table.getSubTable(name)
             assert(subTable)
@@ -87,66 +93,56 @@ class Drivetrain(commands2.SubsystemBase):
         self.ang = 0
         self.iteration = 0
         
+        AutoBuilder.configureHolonomic(
+            self.getPose, # Robot pose supplier
+            self.resetPose, # Method to reset odometry (will be called if your auto has a starting pose)
+            self.getRobotRelativeSpeeds(), # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.runVelocity, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
+                PIDConstants(5.0, 0.0, 0.0), # Rotation PID constants
+                4.5, # Max module speed, in m/s
+                0.4, # Drive base radius in meters. Distance from robot center to furthest module.
+                ReplanningConfig() # Default path replanning config. See the API for the options here
+            ),
+            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+            self # Reference to this subsystem to set requirements
+        )
+    
+    def followPathCommand(self, pathName: str):
+        path = PathPlannerPath.fromPathFile(pathName)
+
+        return FollowPathHolonomic(
+            path,
+            self.getPose, # Robot pose supplier
+            self.getRobotRelativeSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.driveRobotRelative, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
+                PIDConstants(5.0, 0.0, 0.0), # Rotation PID constants
+                4.5, # Max module speed, in m/s
+                0.4, # Drive base radius in meters. Distance from robot center to furthest module.
+                ReplanningConfig() # Default path replanning config. See the API for the options here
+            ),
+            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+            self # Reference to this subsystem to set requirements
+        )
+
+
     def shouldFlipPath(self):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
     def getHeading(self) -> Rotation2d:
         return Rotation2d.fromDegrees(self.imu.getFusedHeading() - self.headingOffset)
 
-    def resetHeading(self):
+    def resetPose(self):
         self.headingOffset = self.imu.getFusedHeading()
         self.resetOdometry()
 
-    def drive(self, xSpeed: float, ySpeed: float, rot: float, fieldRelative: bool):
-        #convert to proper units
-        #actually don't
-        rot = rot# * 180.0
-        #print(f"drive: x {xSpeed}, y {ySpeed}, rot {rot}, field {fieldRelative}")
-        #rot = self.ang
-        #rot = rot * 360
-        #self.ang += 1.0
-        #rot = int(rot) % 180
-        #self.iteration += 1
-        #if(self.iteration % 100 == 0):
-        #    print(f"drive: x {xSpeed}, y {ySpeed}, rot {rot}, field {fieldRelative}, speed {xSpeed * self.kMaxVoltage}")
-
-
-        #for mod in self.swerveModules:
-        #    mod.set(xSpeed * self.kMaxVoltage, rot)
-
-        #return
-        #speed = max(abs(xSpeed), abs(ySpeed))
-        #ang = (math.degrees(math.atan2(ySpeed, xSpeed)) +90.0) %360.0
-        # if(abs(xSpeed) < 0.8 and abs(ySpeed) < 0.8):
-        #     pass
-        #     print("pass")
-        #     self.setSteer(ang)
-        #     self.setDrive(abs(speed))
-        # else:
-        #     print(f"Set {ang}")
-        #     self.setSteer(ang)
-        #     self.setDrive(abs(speed))
-
-        chassisSpeeds = None
-        if not fieldRelative:
-            #print("robot relative")
-            chassisSpeeds = wpimath.kinematics.ChassisSpeeds(ySpeed, -xSpeed, rot)
-        else:
-            #print("field relative")
-            chassisSpeeds = wpimath.kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, -xSpeed, rot, self.getHeading())
-
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(chassisSpeeds)
-        self.kinematics.desaturateWheelSpeeds(swerveModuleStates, self.kMaxVelocityMPS)
-
-        for mod, state in zip(self.swerveModules, swerveModuleStates):
-            mod.setSwerveModuleState(state, self.kMaxVelocityMPS)
-
-        self.updateOdometry()
-        self.setChassisSpeeds(chassisSpeeds)
-
-    def driveRobotRelative(self, chassisSpeeds):
-        for mod, state in zip(self.swerveModules, chassisSpeeds):
-            mod.setSwerveModuleState(state, self.kMaxVelocityMPS)
+    def driveRobotRelative(self, chassisSpeeds : ChassisSpeeds):
+        for mod, speed in zip(self.swerveModules, chassisSpeeds):
+            print(speed)
+            mod.setDriveVoltage(speed)
 
         self.updateOdometry()
         self.setChassisSpeeds(chassisSpeeds)
@@ -168,7 +164,7 @@ class Drivetrain(commands2.SubsystemBase):
         else:
             self.posTable = self.datatable.getTable("Robot position")
     
-    def getChassisSpeeds(self):
+    def getRobotRelativeSpeeds(self) -> ChassisSpeeds:
         return self.chassisSpeeds
 
     def setChassisSpeeds(self, chassisSpeeds):
@@ -183,7 +179,7 @@ class Drivetrain(commands2.SubsystemBase):
                             Pose2d()
                             )
         
-    def getPos(self) -> Pose2d:
+    def getPose(self) -> Pose2d:
         return self.pos
         
     def disable(self, steer = True, drive = True):
@@ -206,6 +202,17 @@ class Drivetrain(commands2.SubsystemBase):
     def setDrive(self, speedPercent: float):
         for m in self.swerveModules:
             m.setDrivePercent(speedPercent)
+
+    def runVelocity(self, speeds : ChassisSpeeds):
+        discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.002)
+
+        setPointStates = self.kinematics.toSwerveModuleStates(discreteSpeeds)
+        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(setPointStates, self.kMaxVelocityMPS)
+
+        optimizedSetpointStates = [wpimath.kinematics.SwerveModuleState() for i in range(4)]
+        for i in range(0, 4):
+            optimizedSetpointStates[i] = self.swerveModules[i].runSetpoint(setPointStates[i])
+
 
     def setFieldDriveRelative(self, state: bool):
         self.fieldRelative = state
