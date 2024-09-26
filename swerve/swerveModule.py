@@ -471,5 +471,5 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
 
             velocityRadPerSec = adjustSpeedSetpoint / (self.consts.getWheelDiameter() / 2)
             voltage = self.driveFeedforward.calculate(velocityRadPerSec) + self.driveFeedback.calculate(self.getDriveVelocity(), velocityRadPerSec)
-            print(voltage)
-            self.setDriveVoltage(voltage)
+            clampedVoltage = max(min(voltage, 10), -10) # don't trust the voltage
+            self.setDriveVoltage(clampedVoltage)
