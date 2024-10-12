@@ -75,10 +75,7 @@ class ShooterPivot(commands2.PIDSubsystem):
 
         wpilib.SmartDashboard.putNumber("Left Climb Current", self.pivotMotorLeft.getOutputCurrent())
         wpilib.SmartDashboard.putNumber("Right Climb Current", self.pivotMotorRight.getOutputCurrent())
-
-
-
-
+        
     def useOutput(self, output: float, setpoint: float):
         zeroing = self.zeroing
         #Do not use output until zeroed

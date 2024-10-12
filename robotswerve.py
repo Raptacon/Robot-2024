@@ -132,22 +132,22 @@ class RobotSwerve:
             lambda: wpimath.applyDeadband(self.driveController.getLeftX(), 0.06),
             lambda: wpimath.applyDeadband(self.driveController.getLeftY(), 0.06),
             lambda: wpimath.applyDeadband(self.driveController.getRightX(), 0.1),
-            lambda: self.driveTrain.getFieldDriveRelative()
+            self.driveTrain.getFieldDriveRelative
         ))
         self.intake.setDefaultCommand(Intake(
             self.intake,
             self.intakePivotController,
             lambda: wpimath.applyDeadband(self.mechController.getLeftTriggerAxis(), 0.05),
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getAButtonPressed(),
+            self.mechController.getRightBumper,
+            self.mechController.getAButtonPressed,
         ))
 
         self.shooter.setDefaultCommand(ShooterCommand(
             self.shooter,
             self.shooterPivot,
-            lambda: self.mechController.getRightBumper(),
-            lambda: self.mechController.getBButton(),
-            lambda: self.mechController.getRightTriggerAxis(),
+            self.mechController.getRightBumper,
+            self.mechController.getBButton,
+            self.mechController.getRightTriggerAxis,
             self.mechController.getYButtonPressed,
             self.mechController.getXButton,
             self.mechController.getLeftBumper,
