@@ -1,6 +1,6 @@
 import commands2
 import rev
-import utils.sparkMaxUtils
+from raptacon3200.utils import sparkMaxUtils
 import wpilib
 class Shooter(commands2.Subsystem):
     def __init__(self) -> None:

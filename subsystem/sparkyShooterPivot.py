@@ -3,7 +3,8 @@ import rev
 import wpilib
 import wpimath
 import wpimath.controller
-import utils.sparkMaxUtils
+from raptacon3200.utils import sparkMaxUtils
+
 class ShooterPivot(commands2.PIDSubsystem):
     normalPid = {"Kp": 72, "Ki": 0, "Kd": 0}
     climbPid = {"Kp": 72*4, "Ki": 0, "Kd": 0}
@@ -194,4 +195,3 @@ class ShooterPivot(commands2.PIDSubsystem):
         self.pivotMotorLeft.setSmartCurrentLimit(current)
         self.pivotMotorRight.setSmartCurrentLimit(current)
         return True
-

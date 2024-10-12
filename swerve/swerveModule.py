@@ -6,7 +6,7 @@ import wpimath.kinematics
 import wpimath.controller
 import rev
 import logging as log
-import utils.sparkMaxUtils
+from raptacon3200.utils import sparkMaxUtils
 
 from .steerController import SteerController
 import ntcore
