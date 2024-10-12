@@ -196,7 +196,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         self.driveMotor = rev.CANSparkMax(
             self.driveId, rev.CANSparkLowLevel.MotorType.kBrushless
         )
-        utils.sparkMaxUtils.configureSparkMaxCanRates(self.driveMotor)
+        sparkMaxUtils.configureSparkMaxCanRates(self.driveMotor)
         self.driveMotor.setInverted(inverted)
 
         # status = self.driveMotor.configAllSettings(motorConfig, 250)
@@ -239,7 +239,7 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         )
         self.steerMotor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
 
-        utils.sparkMaxUtils.configureSparkMaxCanRates(self.steerMotor)
+        sparkMaxUtils.configureSparkMaxCanRates(self.steerMotor)
         self.steerEncoder = self.encoder
 
         # motorConfig = ctre.TalonFXConfiguration()

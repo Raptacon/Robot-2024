@@ -6,12 +6,12 @@ class Shooter(commands2.Subsystem):
     def __init__(self) -> None:
         super().__init__()
         self.intakeMotor = rev.CANSparkMax(23, rev.CANSparkLowLevel.MotorType.kBrushless)
-        utils.sparkMaxUtils.configureSparkMaxCanRates(self.intakeMotor)
+        sparkMaxUtils.configureSparkMaxCanRates(self.intakeMotor)
         self.intakeMotor.setInverted(True)
         self.leftShootMotor = rev.CANSparkMax(24, rev.CANSparkLowLevel.MotorType.kBrushless)
-        utils.sparkMaxUtils.configureSparkMaxCanRates(self.leftShootMotor)
+        sparkMaxUtils.configureSparkMaxCanRates(self.leftShootMotor)
         self.rightShooterMotor = rev.CANSparkMax(25, rev.CANSparkLowLevel.MotorType.kBrushless)
-        utils.sparkMaxUtils.configureSparkMaxCanRates(self.rightShooterMotor)
+        sparkMaxUtils.configureSparkMaxCanRates(self.rightShooterMotor)
         self.rightShooterMotor.setInverted(False)
 
         self.leftShootMotor.enableVoltageCompensation(11.5)
