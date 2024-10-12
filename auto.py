@@ -5,14 +5,18 @@ from subsystem.swerveDriveTrain import Drivetrain
 from commands.sparkyAuto import HandOff
 from subsystem.sparkyShooter import Shooter
 from subsystem.sparkyIntake import SparkyIntake
+from commands.autoSparkyShooterPivot import AutoShooterPivot
+from subsystem.sparkyShooterPivot import ShooterPivot
+from subsystem.sparkyIntakePivotController import getPivotInstantCommand, pivotController
 import logging
 
 log = logging.getLogger("Auto")
 
 class SparkyShoot(commands2.SequentialCommandGroup):
-    def __init__(self, shooter : Shooter, intake : SparkyIntake, drive: Drivetrain) -> None:
+    def __init__(self, shooter : Shooter, intake : SparkyIntake, drive: Drivetrain, intakePivot : pivotController, shooterPivot : ShooterPivot) -> None:
         super().__init__()
         self.addCommands(
+<<<<<<< HEAD
             commands2.PrintCommand("Running Shooter"),
             HandOff(shooter, intake, 2, 0.4),
             commands2.PrintCommand("Finished Shooter"),
@@ -25,4 +29,8 @@ class SparkyShoot(commands2.SequentialCommandGroup):
             commands2.PrintCommand("AutoDrive second move finished"),
             AutoDrive(1.4, 0, 0.2, 0, True, drive), #move back to the scoring area, may need to change values, arm going up during this
             commands2.PrintCommand("AutoDrive final move finnished"),
+=======
+            AutoShooterPivot(shooterPivot, "loading"),
+            getPivotInstantCommand(intakePivot, intakePivot.setGroundPickup),
+>>>>>>> 3a1c7654d067d464a2e9a66bfa58bf9b834b535d
         )
