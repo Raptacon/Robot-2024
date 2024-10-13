@@ -42,6 +42,7 @@ class ShooterCommand(commands2.CommandBase):
             self.shooter.runIntake(0.2)
         elif(self.outaking()):
             self.shooter.runIntake(-0.2)
+            self.shooter.runShooters(-6.0)
         else:
             self.shooter.runIntake(0)
 
