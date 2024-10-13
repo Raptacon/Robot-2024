@@ -38,15 +38,16 @@ class ShooterCommand(commands2.CommandBase):
         self.addRequirements(self.shooter, self.pivot)
 
     def execute(self):
+        voltage = 0
+
         if(self.intaking()):
             self.shooter.runIntake(0.2)
         elif(self.outaking()):
             self.shooter.runIntake(-0.2)
-            self.shooter.runShooters(-6.0)
+            voltage = -6.0
         else:
             self.shooter.runIntake(0)
 
-        voltage = 0
         # set full speed if enabling shooter
         if self.shooterSpeed() > 0.2:
             voltage = 12.0
