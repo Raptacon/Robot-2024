@@ -168,3 +168,9 @@ There is a /home/lvuser/deploy.json file which at the time of this writing (2023
   "git-branch": "fix-recal-nbeasley"
 }
 ```
+
+### Raptacon Release Versions
+
+We use a YYYY.MM.BuidVersion semantic versioning schema. So for October 2024, you'd have 2024.10. For Janurary, you'd have 2024.01. The version number will just increment from the last number. Ie if the release is 2024.03.6 then the next build is 2024.03.7. 
+
+#### Creating a new release
