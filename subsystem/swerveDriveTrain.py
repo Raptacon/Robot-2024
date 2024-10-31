@@ -11,6 +11,9 @@ import wpilib
 
 from wpilib import DriverStation
 
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
+
 import ntcore
 
 class Drivetrain(commands2.SubsystemBase):
@@ -86,6 +89,23 @@ class Drivetrain(commands2.SubsystemBase):
         self.setFieldDriveRelative(True)
         self.ang = 0
         self.iteration = 0
+
+
+        AutoBuilder.configureHolonomic(
+            self.getPos, # Robot pose supplier
+            self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
+            self.getChassisSpeeds(), # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.runVelocity, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                PIDConstants(0.05, 0.0, 0.0), # Translation PID constants
+                PIDConstants(0.2, 0.0, 0.1), # Rotation PID constants
+                self.kMaxVelocityMPS, # Max module speed, in m/s
+                self.kTrackBaseMeters, # Drive base radius in meters. Distance from robot center to furthest module.
+                ReplanningConfig() # Default path replanning config. See the API for the options here
+            ),
+            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+            self # Reference to this subsystem to set requirements
+        )
         
     def shouldFlipPath(self):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
@@ -150,6 +170,17 @@ class Drivetrain(commands2.SubsystemBase):
 
         self.updateOdometry()
         self.setChassisSpeeds(chassisSpeeds)
+
+    def runVelocity(self, speeds : wpimath.kinematics.ChassisSpeeds):
+        discreteSpeeds = wpimath.kinematics.ChassisSpeeds.discretize(speeds, 0.002)
+
+        setPointStates = self.kinematics.toSwerveModuleStates(discreteSpeeds)
+        self.kinematics.desaturateWheelSpeeds(setPointStates, self.kMaxVelocityMPS)
+
+        for mod, state in zip(self.swerveModules, setPointStates):
+            mod.runSetpoint(state)
+
+        self.updateOdometry()
 
     def updateOdometry(self):
         self.pos = self.odometry.update(self.getHeading(),
