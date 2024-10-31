@@ -324,6 +324,9 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
 
     def getDrivePosition(self):
         return self.driveEncoder.getPosition()
+    
+    def getDriveVoltage(self):
+        return self.driveMotor.getBusVoltage()
 
     def getCurrentAngle(self):
         return self.encoder.getAbsolutePosition()
@@ -338,6 +341,25 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         steer = state.angle.degrees()
         # print(f"Speed {speed} Steer {steer} {state.angle.degrees}")
         self.set(speed, steer)
+
+    def runSetpoint(self, state : wpimath.kinematics.SwerveModuleState) -> wpimath.kinematics.SwerveModuleState:
+        optimizedState = wpimath.kinematics.SwerveModuleState.optimize(state, wpimath.geometry.Rotation2d(self.getSteerAngle()))
+
+        angleSetpoint = optimizedState.angle.degrees()
+        speedSetpoint = optimizedState.speed
+
+        adjustSpeedSetpoint = speedSetpoint * math.cos(self.steerPIDController.getPositionError())
+
+        velocityRadPerSec = adjustSpeedSetpoint / (self.consts.getWheelDiameter() / 2)
+        curVel = (self.getDriveVelocity() * math.pi) / 60
+        voltage = self.driveFeedforward.calculate(velocityRadPerSec) + self.driveFeedback.calculate(curVel, velocityRadPerSec)
+        clampedVoltage = max(min(voltage, 8), -8) # don't trust the voltage
+        print(f"{self.driveId} motor. Setpoint: {velocityRadPerSec} Current Point: {curVel}") 
+        print(f"{self.driveId} motor. SetAngle: {angleSetpoint} Current angle: {self.getCurrentAngle()}") 
+        
+        self.set(-clampedVoltage, angleSetpoint)
+
+        return optimizedState
 
     def set(self, driveVoltage: float, steerAngleDeg: float):
         """
@@ -447,26 +469,3 @@ class SwerveModuleMk4L1SparkMaxNeoCanCoder:
         else:
             # self.driveMotor.setNeutralMode(ctre.NeutralMode.Brake)
             pass
-
-    def runSetpoint(self, state : wpimath.kinematics.SwerveModuleState) -> wpimath.kinematics.SwerveModuleState:
-        optimizedState = wpimath.kinematics.SwerveModuleState.optimize(state, wpimath.geometry.Rotation2d(self.getSteerAngle()))
-
-        angleSetpoint = optimizedState.angle
-        speedSetpoint = optimizedState.speed_fps
-
-        self.setSetpoint(speedSetpoint, angleSetpoint)
-
-        return optimizedState
-    
-    def setSetpoint(self, speedSetpoint: float, angleSetpoint: wpimath.geometry.Rotation2d):
-
-        if (not (angleSetpoint == None)):
-            self.setSteerAngle(angleSetpoint.degrees())
-
-        if (not (speedSetpoint == None)):
-            adjustSpeedSetpoint = speedSetpoint * math.cos(self.steerPIDController.getPositionError())
-
-            velocityRadPerSec = adjustSpeedSetpoint / (self.consts.getWheelDiameter() / 2)
-            voltage = self.driveFeedforward.calculate(velocityRadPerSec) + self.driveFeedback.calculate(self.getDriveVelocity(), velocityRadPerSec)
-            clampedVoltage = max(min(voltage, 10), -10) # don't trust the voltage
-            self.setDriveVoltage(clampedVoltage)

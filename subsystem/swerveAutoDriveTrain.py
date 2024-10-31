@@ -99,29 +99,10 @@ class AutoDrivetrain(commands2.SubsystemBase):
             self.getRobotRelativeSpeeds(), # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             self.runVelocity, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
-                PIDConstants(5.0, 0.0, 0.0), # Rotation PID constants
-                4.5, # Max module speed, in m/s
-                0.4, # Drive base radius in meters. Distance from robot center to furthest module.
-                ReplanningConfig() # Default path replanning config. See the API for the options here
-            ),
-            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
-            self # Reference to this subsystem to set requirements
-        )
-    
-    def followPathCommand(self, pathName: str):
-        path = PathPlannerPath.fromPathFile(pathName)
-
-        return FollowPathHolonomic(
-            path,
-            self.getPose, # Robot pose supplier
-            self.getRobotRelativeSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            self.driveRobotRelative, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
-                PIDConstants(5.0, 0.0, 0.0), # Rotation PID constants
-                4.5, # Max module speed, in m/s
-                0.4, # Drive base radius in meters. Distance from robot center to furthest module.
+                PIDConstants(0.05, 0.0, 0.0), # Translation PID constants
+                PIDConstants(0.2, 0.0, 0.1), # Rotation PID constants
+                self.kMaxVelocityMPS, # Max module speed, in m/s
+                self.kTrackBaseMeters, # Drive base radius in meters. Distance from robot center to furthest module.
                 ReplanningConfig() # Default path replanning config. See the API for the options here
             ),
             self.shouldFlipPath, # Supplier to control path flipping based on alliance color
@@ -207,12 +188,14 @@ class AutoDrivetrain(commands2.SubsystemBase):
         discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.002)
 
         setPointStates = self.kinematics.toSwerveModuleStates(discreteSpeeds)
-        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(setPointStates, self.kMaxVelocityMPS)
+        self.kinematics.desaturateWheelSpeeds(setPointStates, self.kMaxVelocityMPS)
 
-        optimizedSetpointStates = [wpimath.kinematics.SwerveModuleState() for i in range(4)]
-        for i in range(0, 4):
-            optimizedSetpointStates[i] = self.swerveModules[i].runSetpoint(setPointStates[i])
+        for mod, state in zip(self.swerveModules, setPointStates):
+            mod.runSetpoint(state)
 
+        self.updateOdometry()
+
+        print(self.getPose())
 
     def setFieldDriveRelative(self, state: bool):
         self.fieldRelative = state
