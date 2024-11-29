@@ -5,6 +5,9 @@ from utils.leds import Strip
 class Leds(commands2.Subsystem):
     kLEDBuffer = 36 #one side temp
     def __init__(self):
+        self.timer = wpilib.Timer()
+        self.timer.start()
+        self.animationHz = 20.0
         self.leds = wpilib.AddressableLED(0)
         self.ledData = [wpilib.AddressableLED.LEDData() for _ in range(self.kLEDBuffer)]
         self.currentHue = 243
@@ -21,8 +24,8 @@ class Leds(commands2.Subsystem):
         self.strips["frontLeft"] = Strip(self.ledData[27:36][::-1], "frontLeft")
         self.strips["frontRight"].setTeamColor()
         self.strips["frontLeft"].setTeamColor()
-        self.strips["rearLeft"].setRainbowHue()
-        self.strips["rearRight"].setRainbowHue()
+        self.strips["rearLeft"].setFlash([0,255,0], [0,100, 0])
+        self.strips["rearRight"].setFlash([0,100, 0], [0,255,0])
 
         #Confiugure the LED strip
         self.leds.setLength(self.kLEDBuffer)
@@ -36,6 +39,10 @@ class Leds(commands2.Subsystem):
         return None
 
     def periodic(self):
+        if not self.timer.advanceIfElapsed(1.0/self.animationHz):
+            return
+
+
         for name,strip in self.strips.items():
             strip.periodic()
 
