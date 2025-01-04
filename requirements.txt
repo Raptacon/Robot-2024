@@ -14,3 +14,5 @@ pyntcore==2024.*
 # If installed on OSX (joystick support) it seems to fail?
 pyfrc == 2024.*
 robotpy-halsim-gui
+
+raptacon3200
