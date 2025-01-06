@@ -1,6 +1,6 @@
 import commands2
 import wpilib
-from utils.leds import Strip
+from raptacon3200.utils.leds import Strip
 
 class Leds(commands2.Subsystem):
     kLEDBuffer = 36 #one side temp
