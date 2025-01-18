@@ -22,10 +22,10 @@ help: ## This list of Makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 sim: setup_${VENV} ## Performs coverage tests and then runs the simulator
-	${VENVBIN}/${PYTHON} -m robot coverage sim
+	${VENVBIN}/${PYTHON} -m robotpy coverage sim
 
 run: ## Runs the robot
-	${PYTHON} -m robot run
+	${VENVBIN}/${PYTHON} -m robotpy run
 
 ${VENV}:
 	${PYTHON} -m venv ${VENV}
